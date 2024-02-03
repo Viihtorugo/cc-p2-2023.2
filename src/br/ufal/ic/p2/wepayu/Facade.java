@@ -1,13 +1,12 @@
 package br.ufal.ic.p2.wepayu;
 
-import br.ufal.ic.p2.wepayu.Exception.EmpregadoNaoExisteException;
-import br.ufal.ic.p2.wepayu.models.Empregado;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import br.ufal.ic.p2.wepayu.exceptions.EmpregadoNaoExisteException;
 
 public class Facade {
+    public void zerarSistema() {};
+
+    public void getAtributoEmpregado(String emp, String atributo) throws EmpregadoNaoExisteException {
+        throw new EmpregadoNaoExisteException();
+    }
 
 }
