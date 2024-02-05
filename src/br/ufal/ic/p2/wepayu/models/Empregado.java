@@ -1,25 +1,12 @@
 package br.ufal.ic.p2.wepayu.models;
 
-public class Empregado {
+public abstract class Empregado {
     private String nome;
     private String endereco;
-    private String tipo;
-    private String salario;
-    private String comissao;
 
-    public Empregado(String nome, String endereco, String tipo, String salario){
+    public Empregado(String nome, String endereco){
         this.nome = nome;
         this.endereco = endereco;
-        this.tipo = tipo;
-        this.salario = salario;
-        this.comissao = "0";
-    }
-    public Empregado(String nome, String endereco, String tipo, String salario, String comissao){
-        this.nome = nome;
-        this.endereco = endereco;
-        this.tipo = tipo;
-        this.salario = salario;
-        this.comissao = comissao;
     }
 
     public String getNome() {
@@ -30,14 +17,8 @@ public class Empregado {
         return this.endereco;
     }
 
-    public String getTipo() {
-        return this.tipo;
-    }
+    public abstract String getSalario();
 
-    public String getSalario() { return this.salario; }
-
-    public String getComissao() {
-        return this.comissao;
-    }
+    public abstract String getTipo();
 
 }

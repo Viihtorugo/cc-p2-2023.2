@@ -2,17 +2,19 @@ package br.ufal.ic.p2.wepayu;
 
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionErrorMessage;
 import br.ufal.ic.p2.wepayu.models.Empregado;
+import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
+import br.ufal.ic.p2.wepayu.models.EmpregadoAssalariado;
+import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
+import br.ufal.ic.p2.wepayu.models.EmpregadoHorista;
 
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Facade {
 
-    public ArrayList<Empregado> empregados;
-
     public void zerarSistema() {
-        if (this.empregados == null)
-            this.empregados = new ArrayList<Empregado>();
+        EmpregadoController.empregados = new HashMap<String, Empregado>();
     }
 
     public String getAtributoEmpregado(String emp, String atributo) throws ExceptionErrorMessage {
@@ -20,32 +22,41 @@ public class Facade {
         if (emp.equals(""))
             throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
 
-        if (!emp.matches("\\d+"))
+        Empregado e = EmpregadoController.getEmpregado(emp);
+
+        if (e == null)
             throw new ExceptionErrorMessage("Empregado nao existe.");
 
-        Empregado e = empregados.get(Integer.parseInt(emp));
-
-        if (atributo.equals("nome")) {
-            return e.getNome();
-        } else if (atributo.equals("tipo")) {
-            return e.getTipo();
-        } else if (atributo.equals("salario")) {
-            String salario = e.getSalario();
-            if (salario.contains(",")) {
-                return salario;
-            } else {
-                return  salario + ",00";
+        switch (atributo) {
+            case "nome" -> {
+                return e.getNome();
             }
-        } else if (atributo.equals("endereco")) {
-            return e.getEndereco();
-        } else if (atributo.equals("comissao")) {
-            return e.getComissao();
-        } else if(atributo.equals("sindicalizado")) {
-            return "false";
-        } else {
-            throw new ExceptionErrorMessage("Atributo nao existe.");
+            case "tipo" -> {
+                return e.getTipo();
+            }
+            case "salario" -> {
+                String salario = e.getSalario();
+                if (salario.contains(",")) {
+                    return salario;
+                } else {
+                    return salario + ",00";
+                }
+            }
+            case "endereco" -> {
+                return e.getEndereco();
+            }
+            case "comissao" -> {
+
+                if (e instanceof EmpregadoComissionado)
+                    return ((EmpregadoComissionado) e).getTaxaDeComissao();
+            }
+            case "sindicalizado" -> {
+                return "false";
+            }
+            default -> throw new ExceptionErrorMessage("Atributo nao existe.");
         }
 
+        return "false";
     }
 
     public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws ExceptionErrorMessage {
@@ -71,9 +82,13 @@ public class Facade {
         if (salario.contains("-"))
             throw new ExceptionErrorMessage("Salario deve ser nao-negativo.");
 
-        this.empregados.add(new Empregado(nome, endereco, tipo, salario));
+        if (tipo.equals("assalariado")) {
+            return EmpregadoController.setEmpregado(new EmpregadoAssalariado(nome, endereco, salario));
+        } else if (tipo.equals("horista")) {
+            return EmpregadoController.setEmpregado(new EmpregadoHorista(nome, endereco, salario));
+        }
 
-        return Integer.toString(this.empregados.size() - 1);
+        return "0";
     }
 
     public String criarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) throws ExceptionErrorMessage {
@@ -108,11 +123,78 @@ public class Facade {
         if (comissao.contains("-"))
             throw new ExceptionErrorMessage("Comissao deve ser nao-negativa.");
 
-
-        this.empregados.add(new Empregado(nome, endereco, tipo, salario, comissao));
-
-        return Integer.toString(this.empregados.size() - 1);
+        return EmpregadoController.setEmpregado(new EmpregadoComissionado(nome, endereco, salario, comissao));
     }
 
-    public void encerrarSistema() {}
+    public String getEmpregadoPorNome(String nome, int indice) throws ExceptionErrorMessage {
+
+        int count = 0;
+
+        for (Map.Entry<String, Empregado> entry : EmpregadoController.empregados.entrySet()) {
+
+            Empregado e = entry.getValue();
+
+            if (nome.contains(e.getNome()))
+                count++;
+
+            if (count == indice)
+                return entry.getKey();
+        }
+
+        throw new ExceptionErrorMessage("Nao ha empregado com esse nome.");
+    }
+
+    public void encerrarSistema() {
+    }
+
+    //termina o file us1
+
+    public void removerEmpregado(String emp) throws ExceptionErrorMessage {
+
+        if (emp.equals(""))
+            throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
+
+        Empregado e = EmpregadoController.getEmpregado(emp);
+
+        if (e == null)
+            throw new ExceptionErrorMessage("Empregado nao existe.");
+
+        EmpregadoController.empregados.remove(emp);
+    }
+
+    public String getHorasNormaisTrabalhadas (String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
+        Empregado e = EmpregadoController.getEmpregado(emp);
+
+        if (e instanceof EmpregadoHorista) {
+            return ((EmpregadoHorista) e).getHorasNormaisTrabalhadas(dataIncial, dataFinal);
+        }
+
+        throw new ExceptionErrorMessage("Empregado nao eh horista.");
+    }
+
+    public String getHorasExtrasTrabalhadas (String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
+        Empregado e = EmpregadoController.getEmpregado(emp);
+
+        if (e instanceof EmpregadoHorista) {
+            return ((EmpregadoHorista) e).getHorasExtrasTrabalhadas(dataIncial, dataFinal);
+        }
+
+        throw new ExceptionErrorMessage("Empregado nao eh horista.");
+    }
+
+    public void lancaCartao(String emp, String data, String horas) throws ExceptionErrorMessage {
+        Empregado e = EmpregadoController.getEmpregado(emp);
+
+        if (emp.equals(""))
+            throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
+
+        if (e == null)
+            throw new ExceptionErrorMessage("Empregado nao existe.");
+
+        if (e instanceof EmpregadoHorista) {
+            ((EmpregadoHorista) e).addRegistro(data, horas);
+        } else {
+            throw new ExceptionErrorMessage("Empregado nao eh horista.");
+        }
+    }
 }
