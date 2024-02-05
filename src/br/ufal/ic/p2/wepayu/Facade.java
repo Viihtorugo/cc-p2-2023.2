@@ -197,4 +197,30 @@ public class Facade {
             throw new ExceptionErrorMessage("Empregado nao eh horista.");
         }
     }
+
+    public String getVendasRealizadas(String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
+        Empregado e = EmpregadoController.getEmpregado(emp);
+
+        if (e instanceof EmpregadoComissionado) {
+            return ((EmpregadoComissionado) e).getVendasRealizadas(dataIncial, dataFinal);
+        }
+
+        throw new ExceptionErrorMessage("Empregado nao eh comissionado.");
+    }
+
+    public void lancaVenda(String emp, String data, String horas) throws ExceptionErrorMessage {
+        Empregado e = EmpregadoController.getEmpregado(emp);
+
+        if (emp.equals(""))
+            throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
+
+        if (e == null)
+            throw new ExceptionErrorMessage("Empregado nao existe.");
+
+        if (e instanceof EmpregadoComissionado) {
+            ((EmpregadoComissionado) e).addVenda(data, horas);
+        } else {
+            throw new ExceptionErrorMessage("Empregado nao eh comissionado.");
+        }
+    }
 }
