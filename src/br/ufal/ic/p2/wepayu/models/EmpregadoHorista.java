@@ -87,8 +87,6 @@ public class EmpregadoHorista extends Empregado {
             if (c.getData().isEqual(dateInit) ||
                     (c.getData().isAfter(dateInit) && c.getData().isBefore(dateEnd))) {
 
-                System.out.println(c.getData() + " " + c.getHoras());
-
                 if (c.getHoras() > 8) {
                     horasAcumuladas += 8.0;
                 } else {
