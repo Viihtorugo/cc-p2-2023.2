@@ -1,12 +1,12 @@
 package br.ufal.ic.p2.wepayu;
 
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionErrorMessage;
-import br.ufal.ic.p2.wepayu.models.Empregado;
+import br.ufal.ic.p2.wepayu.models.*;
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
-import br.ufal.ic.p2.wepayu.models.EmpregadoAssalariado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoHorista;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +15,9 @@ public class Facade {
 
     public void zerarSistema() {
         EmpregadoController.empregados = new HashMap<String, Empregado>();
+    }
+
+    public void encerrarSistema() {
     }
 
     public String getAtributoEmpregado(String emp, String atributo) throws ExceptionErrorMessage {
@@ -144,9 +147,6 @@ public class Facade {
         throw new ExceptionErrorMessage("Nao ha empregado com esse nome.");
     }
 
-    public void encerrarSistema() {
-    }
-
     //termina o file us1
 
     public void removerEmpregado(String emp) throws ExceptionErrorMessage {
@@ -162,7 +162,7 @@ public class Facade {
         EmpregadoController.empregados.remove(emp);
     }
 
-    public String getHorasNormaisTrabalhadas (String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
+    public String getHorasNormaisTrabalhadas(String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
         Empregado e = EmpregadoController.getEmpregado(emp);
 
         if (e instanceof EmpregadoHorista) {
@@ -172,7 +172,7 @@ public class Facade {
         throw new ExceptionErrorMessage("Empregado nao eh horista.");
     }
 
-    public String getHorasExtrasTrabalhadas (String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
+    public String getHorasExtrasTrabalhadas(String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
         Empregado e = EmpregadoController.getEmpregado(emp);
 
         if (e instanceof EmpregadoHorista) {
@@ -222,5 +222,129 @@ public class Facade {
         } else {
             throw new ExceptionErrorMessage("Empregado nao eh comissionado.");
         }
+    }
+
+    public void alteraEmpregado(String emp, String atributo, String valor) {
+        if (atributo.equals("nome")) {
+            EmpregadoController.getEmpregado(emp).setNome(valor);
+        } else if (atributo.equals("endereco")) {
+            EmpregadoController.getEmpregado(emp).setEndereco(valor);
+        } else if (atributo.equals("salario")) {
+            EmpregadoController.getEmpregado(emp).setSalario(valor);
+        } else if (atributo.equals("sindicalizado")) {
+            if (valor.equals("false")) {
+                EmpregadoController.empregados.get(emp).setSindicalizado(null);
+            }
+        }
+    }
+
+    public void alteraEmpregado(String emp, String atributo, String valor, String idSindicato, String taxaSindical) throws ExceptionErrorMessage {
+        if (atributo.equals("sindicalizado") && valor.equals("true")) {
+            boolean v = true;
+
+            for (Map.Entry<String, Empregado> entry : EmpregadoController.empregados.entrySet()) {
+                MembroSindicalizado m = entry.getValue().getSindicalizado();
+
+                if (m != null)
+                    if (m.getIdMembro().equals(idSindicato))
+                        v = false;
+            }
+
+            if (v == false)
+                throw new ExceptionErrorMessage("Ha outro empregado com esta identificacao de sindicato");
+
+            EmpregadoController.empregados.get(emp).setSindicalizado(new MembroSindicalizado(idSindicato, Double.parseDouble(taxaSindical.replace(",", "."))));
+        }
+    }
+
+    public void lancaTaxaServico(String membro, String data, String valor) throws ExceptionErrorMessage {
+
+        double value = Double.parseDouble(valor.replace(",", "."));
+
+        if (value <= 0)
+            throw new ExceptionErrorMessage("Valor deve ser positivo.");
+
+        if (membro.equals(""))
+            throw new ExceptionErrorMessage("Identificacao do membro nao pode ser nula.");
+
+        String id = EmpregadoController.getEmpregadoPorIdSindical(membro);
+
+        if (id == null)
+            throw new ExceptionErrorMessage("Membro nao existe.");
+
+        try {
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
+            LocalDate date = LocalDate.parse(data, formato);
+            EmpregadoController.getEmpregado(id).addTaxaServico(new TaxaServico(date, value));
+        } catch (DateTimeParseException e) {
+            throw new ExceptionErrorMessage("Data invalida.");
+        }
+
+    }
+
+    public String getTaxasServico(String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
+
+        LocalDate dateInit;
+        LocalDate dateEnd;
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
+
+        int d = 0, m = 0, y, i = 0;
+
+        for (String s : dataFinal.split("/")) {
+            if (i == 0) {
+                d = Integer.parseInt(s);
+                i++;
+            } else if (i == 1) {
+                m = Integer.parseInt(s);
+                i++;
+            } else {
+                y = Integer.parseInt(s);
+            }
+        }
+
+        if (m == 2 && d > 29) {
+            throw new ExceptionErrorMessage("Data final invalida.");
+        }
+
+        dateEnd = LocalDate.parse(dataFinal, formato);
+
+        try {
+            dateInit = LocalDate.parse(dataIncial, formato);
+        } catch (DateTimeParseException e) {
+            throw new ExceptionErrorMessage("Data inicial invalida.");
+        }
+
+        if (dateInit.isAfter(dateEnd)) {
+            throw new ExceptionErrorMessage("Data inicial nao pode ser posterior aa data final.");
+        }
+
+        if (dateInit.isEqual(dateEnd))
+            return "0,00";
+
+        Empregado e = EmpregadoController.getEmpregado(emp);
+
+        if (e == null)
+            return "0,00";
+
+        MembroSindicalizado memSind = e.getSindicalizado();
+
+        if (memSind == null)
+            throw new ExceptionErrorMessage("Empregado nao eh sindicalizado.");
+
+        double countTaxas = 0;
+
+        ArrayList<TaxaServico> taxas = memSind.getTaxaServicos();
+
+        if (taxas == null)
+            return "0,00";
+
+        for (TaxaServico t : taxas) {
+            if (t.getData().isEqual(dateInit) ||
+                    (t.getData().isAfter(dateInit) && t.getData().isBefore(dateEnd))) {
+                countTaxas += t.getValor();
+            }
+        }
+
+        return String.format("%.2f", countTaxas).replace(".", ",");
     }
 }

@@ -125,9 +125,14 @@ public class EmpregadoHorista extends Empregado {
         return Integer.toString((int) horasAcumuladas);
     }
 
+    @Override
+    public void setSalario (String salario) {
+        this.salarioPorHora = salario;
+    }
 
+    @Override
     public String getSalario() {
-        return salarioPorHora;
+        return this.salarioPorHora;
     }
 
     @Override

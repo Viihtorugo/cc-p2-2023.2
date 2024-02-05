@@ -104,6 +104,11 @@ public class EmpregadoComissionado extends Empregado {
     }
 
     @Override
+    public void setSalario (String salario) {
+        this.salarioMensal = salario;
+    }
+
+    @Override
     public String getSalario() {
         return salarioMensal;
     }
