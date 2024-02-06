@@ -16,9 +16,7 @@ public class Facade {
 
     public void zerarSistema() {
         EmpregadoController.empregados = new HashMap<String, Empregado>();
-    }
-
-    public void encerrarSistema() {
+        System.out.println("-> Sistema zerado");
     }
 
     public String getAtributoEmpregado(String emp, String atributo) throws ExceptionErrorMessage {
@@ -97,10 +95,10 @@ public class Facade {
 
     public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws ExceptionErrorMessage {
 
-        if (nome.equals(""))
+        if (nome.isEmpty())
             throw new ExceptionErrorMessage("Nome nao pode ser nulo.");
 
-        if (endereco.equals(""))
+        if (endereco.isEmpty())
             throw new ExceptionErrorMessage("Endereco nao pode ser nulo.");
 
         if (tipo.equals("abc"))
@@ -109,7 +107,7 @@ public class Facade {
         if (tipo.equals("comissionado"))
             throw new ExceptionErrorMessage("Tipo nao aplicavel.");
 
-        if (salario.equals(""))
+        if (salario.isEmpty())
             throw new ExceptionErrorMessage("Salario nao pode ser nulo.");
 
         if (!salario.matches("[0-9,-]+"))
@@ -129,10 +127,10 @@ public class Facade {
 
     public String criarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) throws ExceptionErrorMessage {
 
-        if (nome.equals(""))
+        if (nome.isEmpty())
             throw new ExceptionErrorMessage("Nome nao pode ser nulo.");
 
-        if (endereco.equals(""))
+        if (endereco.isEmpty())
             throw new ExceptionErrorMessage("Endereco nao pode ser nulo.");
 
         if (tipo.equals("abc"))
@@ -141,7 +139,7 @@ public class Facade {
         if (tipo.equals("horista") || tipo.equals("assalariado"))
             throw new ExceptionErrorMessage("Tipo nao aplicavel.");
 
-        if (salario.equals(""))
+        if (salario.isEmpty())
             throw new ExceptionErrorMessage("Salario nao pode ser nulo.");
 
         if (!salario.matches("[0-9,-]+"))
@@ -150,7 +148,7 @@ public class Facade {
         if (salario.contains("-"))
             throw new ExceptionErrorMessage("Salario deve ser nao-negativo.");
 
-        if (comissao.equals(""))
+        if (comissao.isEmpty())
             throw new ExceptionErrorMessage("Comissao nao pode ser nula.");
 
         if (!comissao.matches("[0-9,-]+"))
@@ -180,11 +178,9 @@ public class Facade {
         throw new ExceptionErrorMessage("Nao ha empregado com esse nome.");
     }
 
-    //termina o file us1
-
     public void removerEmpregado(String emp) throws ExceptionErrorMessage {
 
-        if (emp.equals(""))
+        if (emp.isEmpty())
             throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
 
         Empregado e = EmpregadoController.getEmpregado(emp);
@@ -319,14 +315,14 @@ public class Facade {
                 String endereco = e.getEndereco();
                 String salario = e.getSalario();
 
-                if(valor.equals("horista"))
-                    EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, salario));
-
-                else if (valor.equals("assalariado"))
-                    EmpregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, salario));
-                else if(valor.equals("comissionado")) EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, "0"));
-
-                else throw new ExceptionErrorMessage("Tipo invalido.");
+                switch (valor) {
+                    case "horista" -> EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, salario));
+                    case "assalariado" ->
+                            EmpregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, salario));
+                    case "comissionado" ->
+                            EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, "0"));
+                    default -> throw new ExceptionErrorMessage("Tipo invalido.");
+                }
             }
 
             case "metodoPagamento" -> {
@@ -373,8 +369,6 @@ public class Facade {
         if (atributo.equals("sindicalizado") && valor.equals("true")) {
             boolean flag = true;
 
-
-
             for (Map.Entry<String, Empregado> entry : EmpregadoController.empregados.entrySet()) {
                 MembroSindicalizado m = entry.getValue().getSindicalizado();
 
@@ -411,7 +405,7 @@ public class Facade {
         if (value <= 0)
             throw new ExceptionErrorMessage("Valor deve ser positivo.");
 
-        if (membro.equals(""))
+        if (membro.isEmpty())
             throw new ExceptionErrorMessage("Identificacao do membro nao pode ser nula.");
 
         String id = EmpregadoController.getEmpregadoPorIdSindical(membro);
@@ -494,4 +488,9 @@ public class Facade {
 
         return String.format("%.2f", countTaxas).replace(".", ",");
     }
+
+    public String totalFolha(String data){
+        return "0,00";
+    }
+
 }
