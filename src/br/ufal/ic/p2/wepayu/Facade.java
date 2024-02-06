@@ -317,13 +317,14 @@ public class Facade {
             case "tipo" -> {
                 String nome = e.getNome();
                 String endereco = e.getEndereco();
+                String salario = e.getSalario();
 
                 if(valor.equals("horista"))
-                    EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, "0"));
+                    EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, salario));
 
                 else if (valor.equals("assalariado"))
-                    EmpregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, "0"));
-                else if(valor.equals("comissionado")) EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, "0", "0"));
+                    EmpregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, salario));
+                else if(valor.equals("comissionado")) EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, "0"));
 
                 else throw new ExceptionErrorMessage("Tipo invalido.");
             }
@@ -347,9 +348,10 @@ public class Facade {
 
         String nome = e.getNome();
         String endereco = e.getEndereco();
+        String salario = e.getSalario();
 
         if (valor.equals("comissionado"))
-            EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, "0", sal));
+            EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, sal));
         else if(valor.equals("horista"))
             EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, sal));
     }
