@@ -6,10 +6,14 @@ public abstract class Empregado {
 
     private MembroSindicalizado sindicalizado;
 
-    public Empregado(String nome, String endereco){
+    private MetodoPagamento metodoPagamento;
+
+
+    public Empregado(String nome, String endereco) {
         this.nome = nome;
         this.endereco = endereco;
-        sindicalizado = null;
+        this.sindicalizado = null;
+        this.metodoPagamento = new EmMaos();
     }
 
     public void setSindicalizado(MembroSindicalizado sindicalizado) {
@@ -46,4 +50,11 @@ public abstract class Empregado {
 
     public abstract String getTipo();
 
+    public MetodoPagamento getMetodoPagamento() {
+        return metodoPagamento;
+    }
+
+    public void setMetodoPagamento(MetodoPagamento metodoPagamento) {
+        this.metodoPagamento = metodoPagamento;
+    }
 }

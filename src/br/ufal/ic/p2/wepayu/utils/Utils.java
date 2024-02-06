@@ -14,4 +14,12 @@ public class Utils {
             return true;
         }
     }
+
+    public static String convertDoubleToString(double value) {
+        if (value != (int) value) return Double.toString(value).replace('.', ',');
+        else return Integer.toString((int) value);
+    }
+    public static String convertDoubleToString(double value, int decimalPlaces) {
+        return String.format(("%." + decimalPlaces +"f"), value).replace(".", ",");
+    }
 }

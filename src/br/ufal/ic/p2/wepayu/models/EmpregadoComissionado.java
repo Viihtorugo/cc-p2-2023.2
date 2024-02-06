@@ -29,6 +29,10 @@ public class EmpregadoComissionado extends Empregado {
         return taxaDeComissao;
     }
 
+    public void setTaxaDeComissao(String taxaDeComissao) {
+        this.taxaDeComissao = taxaDeComissao;
+    }
+
     public void addVenda(String dataString, String valor) throws ExceptionErrorMessage {
 
         double value = Double.parseDouble(valor.replace(",", "."));

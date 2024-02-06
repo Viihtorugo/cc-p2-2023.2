@@ -7,16 +7,16 @@ import java.util.Map;
 
 public class EmpregadoController {
     public static HashMap<String, Empregado> empregados;
-    public static int size = 0;
+    public static int key = 0;
 
     public static String setEmpregado(Empregado e) {
-        size++;
-        empregados.put(Integer.toString(size),e);
-        return Integer.toString(size);
+        key++;
+        empregados.put(Integer.toString(key),e);
+        return Integer.toString(key);
     }
 
-    public static Empregado getEmpregado(String index) {
-        return empregados.get(index);
+    public static Empregado getEmpregado(String key) {
+        return empregados.get(key);
     }
 
     public static String getEmpregadoPorIdSindical (String idSindical) {
@@ -34,5 +34,10 @@ public class EmpregadoController {
 
         return null;
     }
+
+    public static void setValue(String key, Empregado e) {
+        empregados.replace(key, e);
+    }
+
 
 }
