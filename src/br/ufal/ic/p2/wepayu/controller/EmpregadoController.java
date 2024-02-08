@@ -1,13 +1,12 @@
 package br.ufal.ic.p2.wepayu.controller;
-import br.ufal.ic.p2.wepayu.models.Empregado;
-import br.ufal.ic.p2.wepayu.models.MembroSindicalizado;
+import br.ufal.ic.p2.wepayu.models.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class EmpregadoController {
     public static HashMap<String, Empregado> empregados;
-    public static int key = 0;
+    public static int key;
 
     public static String setEmpregado(Empregado e) {
         key++;
@@ -17,6 +16,54 @@ public class EmpregadoController {
 
     public static Empregado getEmpregado(String key) {
         return empregados.get(key);
+    }
+
+    public static HashMap<String, EmpregadoHorista> getEmpregadoHoristas() {
+
+        HashMap <String, EmpregadoHorista> empregadoHoristas = new HashMap<String,EmpregadoHorista>();
+
+        for (Map.Entry<String, Empregado> e: empregados.entrySet()) {
+
+            Empregado empregado = e.getValue();
+
+            if (empregado.getTipo().equals("horista")) {
+                empregadoHoristas.put(e.getKey(), (EmpregadoHorista) empregado);
+            }
+        }
+
+        return empregadoHoristas;
+    }
+
+    public static HashMap<String, EmpregadoComissionado> getEmpregadoComissionado() {
+
+        HashMap <String, EmpregadoComissionado> empregadoHoristas = new HashMap<String,EmpregadoComissionado>();
+
+        for (Map.Entry<String, Empregado> e: empregados.entrySet()) {
+
+            Empregado empregado = e.getValue();
+
+            if (empregado.getTipo().equals("comissionado")) {
+                empregadoHoristas.put(e.getKey(), (EmpregadoComissionado) empregado);
+            }
+        }
+
+        return empregadoHoristas;
+    }
+
+    public static HashMap<String, EmpregadoAssalariado> getEmpregadoAssalariado() {
+
+        HashMap <String, EmpregadoAssalariado> empregadoHoristas = new HashMap<String,EmpregadoAssalariado>();
+
+        for (Map.Entry<String, Empregado> e: empregados.entrySet()) {
+
+            Empregado empregado = e.getValue();
+
+            if (empregado.getTipo().equals("assalariado")) {
+                empregadoHoristas.put(e.getKey(), (EmpregadoAssalariado) empregado);
+            }
+        }
+
+        return empregadoHoristas;
     }
 
     public static String getEmpregadoPorIdSindical (String idSindical) {

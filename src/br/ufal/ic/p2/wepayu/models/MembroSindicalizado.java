@@ -1,5 +1,8 @@
 package br.ufal.ic.p2.wepayu.models;
 
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class MembroSindicalizado {
@@ -10,12 +13,32 @@ public class MembroSindicalizado {
     public MembroSindicalizado(String idMembro, double taxaSindical) {
         this.idMembro = idMembro;
         this.taxaSindical = taxaSindical;
-        this.taxaServicos = new ArrayList<TaxaServico>();
+        this.taxaServicos = new ArrayList<>();
     }
 
+    public double getTaxaServicos(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
 
-    public ArrayList<TaxaServico> getTaxaServicos() {
-        return this.taxaServicos;
+        double countTaxas = 0;
+
+        if (dataInicial.isAfter(dataFinal)) {
+            ExceptionEmpregado e = new ExceptionEmpregado();
+            e.msgDataInicialPosteriorDataFinal();
+
+            return countTaxas;
+        }
+
+        if (dataInicial.isEqual(dataFinal)) {
+            return countTaxas;
+        }
+
+        for (TaxaServico t : this.taxaServicos) {
+            if (t.getData().isEqual(dataInicial) ||
+                    (t.getData().isAfter(dataInicial) && t.getData().isBefore(dataFinal))) {
+                countTaxas += t.getValor();
+            }
+        }
+
+        return countTaxas;
     }
 
     public double getTaxaSindical() {

@@ -44,12 +44,6 @@ public abstract class Empregado {
         this.nome = nome;
     }
 
-    public abstract String getSalario();
-
-    public abstract void setSalario(String salario);
-
-    public abstract String getTipo();
-
     public MetodoPagamento getMetodoPagamento() {
         return metodoPagamento;
     }
@@ -57,4 +51,10 @@ public abstract class Empregado {
     public void setMetodoPagamento(MetodoPagamento metodoPagamento) {
         this.metodoPagamento = metodoPagamento;
     }
+
+    public abstract double getSalario();
+
+    public abstract void setSalario(double salario);
+
+    public abstract String getTipo();
 }

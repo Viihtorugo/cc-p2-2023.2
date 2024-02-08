@@ -1,119 +1,66 @@
 package br.ufal.ic.p2.wepayu.models;
 
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionErrorMessage;
-import br.ufal.ic.p2.wepayu.utils.Utils;
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 public class EmpregadoComissionado extends Empregado {
 
-    private String taxaDeComissao;
-    private String salarioMensal;
+    private double taxaDeComissao;
+    private double salarioMensal;
     private ArrayList<CartaoDeVenda> vendas;
 
-    public EmpregadoComissionado(String nome, String endereco, String salarioMensal, String taxaDeComissao) {
+    public EmpregadoComissionado(String nome, String endereco, double salarioMensal, double taxaDeComissao) {
         super(nome, endereco);
         this.taxaDeComissao = taxaDeComissao;
         this.salarioMensal = salarioMensal;
         this.vendas = new ArrayList<CartaoDeVenda>();
     }
 
-    public String getSalarioMensal() {
-        return salarioMensal;
-    }
-
-    public String getTaxaDeComissao() {
+    public double getTaxaDeComissao() {
         return taxaDeComissao;
     }
 
-    public void setTaxaDeComissao(String taxaDeComissao) {
+    public void setTaxaDeComissao(double taxaDeComissao) {
         this.taxaDeComissao = taxaDeComissao;
     }
 
-    public void addVenda(String dataString, String valor) throws ExceptionErrorMessage {
-
-        double value = Double.parseDouble(valor.replace(",", "."));
-
-        if (value <= 0) {
-            throw new ExceptionErrorMessage("Valor deve ser positivo.");
-        }
-
-        try {
-            DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
-            LocalDate dataFormato = LocalDate.parse(dataString, formato);
-
-            this.vendas.add(new CartaoDeVenda(dataFormato, value));
-        } catch (DateTimeParseException e) {
-            throw new ExceptionErrorMessage("Data invalida.");
-        }
-
+    public void addVenda(LocalDate data, double valor) {
+        this.vendas.add(new CartaoDeVenda(data, valor));
     }
 
-    public String getVendasRealizadas(String dataIncial, String dataFinal) throws ExceptionErrorMessage {
+    public double getVendasRealizadas(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
 
         double vendasRealizadas = 0;
-        LocalDate dateInit;
-        LocalDate dateEnd;
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
 
-        int d = 0, m = 0, y, i = 0;
+        if (dataInicial.isEqual(dataFinal))
+            return vendasRealizadas;
 
-        for (String s : dataFinal.split("/")) {
-            if (i == 0) {
-                d = Integer.parseInt(s);
-                i++;
-            } else if (i == 1) {
-                m = Integer.parseInt(s);
-                i++;
-            } else {
-                y = Integer.parseInt(s);
-            }
-        }
+        if (dataInicial.isAfter(dataFinal)) {
+            ExceptionEmpregado e = new ExceptionEmpregado();
+            e.msgDataInicialPosteriorDataFinal();
 
-        if (m == 2 && d > 29) {
-            throw new ExceptionErrorMessage("Data final invalida.");
-        }
-
-        dateEnd = LocalDate.parse(dataFinal, formato);
-
-        try {
-            dateInit = LocalDate.parse(dataIncial, formato);
-        } catch (DateTimeParseException e) {
-            throw new ExceptionErrorMessage("Data inicial invalida.");
-        }
-
-        if (dateInit.isAfter(dateEnd)) {
-            throw new ExceptionErrorMessage("Data inicial nao pode ser posterior aa data final.");
-        }
-
-        if (dateInit.isEqual(dateEnd)) {
-            return "0,00";
+            return vendasRealizadas;
         }
 
         for (CartaoDeVenda c : this.vendas) {
-            if (c.getData().isEqual(dateInit) ||
-                    (c.getData().isAfter(dateInit) && c.getData().isBefore(dateEnd))) {
+            if (c.getData().isEqual(dataInicial) ||
+                    (c.getData().isAfter(dataInicial) && c.getData().isBefore(dataFinal))) {
                 vendasRealizadas += c.getHoras();
             }
         }
 
-        if (vendasRealizadas == 0) {
-            return "0,00";
-        }
-
-        return Double.toString(vendasRealizadas).replace(".",",") + "0";
+        return vendasRealizadas;
     }
 
     @Override
-    public void setSalario (String salario) {
+    public void setSalario (double salario) {
         this.salarioMensal = salario;
     }
 
     @Override
-    public String getSalario() {
+    public double getSalario() {
         return salarioMensal;
     }
 

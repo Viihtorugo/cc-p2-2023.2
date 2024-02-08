@@ -1,91 +1,54 @@
 package br.ufal.ic.p2.wepayu.models;
 
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionErrorMessage;
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 
-import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
 public class EmpregadoHorista extends Empregado {
 
-    private String salarioPorHora;
+    private double salarioPorHora;
     private ArrayList<CartaoDePonto> cartao;
 
-    public EmpregadoHorista(String nome, String endereco, String salarioPorHora) {
+    public EmpregadoHorista(String nome, String endereco, double salarioPorHora) {
         super(nome, endereco);
         this.salarioPorHora = salarioPorHora;
         this.cartao = new ArrayList<CartaoDePonto>();
     }
 
-    public String getSalarioPorHora() {
-        return salarioPorHora;
+    public boolean checkDateCartaoDePonto (LocalDate date) {
+        for (int i = 0; i < this.cartao.size(); i++)
+           if (date.isEqual(this.cartao.get(i).getData()))
+               return true;
+
+        return false;
     }
 
-    public void addRegistro(String dataString, String horas) throws ExceptionErrorMessage {
-
-        if (Double.parseDouble(horas.replace(",", ".")) <= 0) {
-            throw new ExceptionErrorMessage("Horas devem ser positivas.");
-        }
-
-        try {
-            DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
-            LocalDate dataFormato = LocalDate.parse(dataString, formato);
-
-            this.cartao.add(new CartaoDePonto(dataFormato, Double.parseDouble(horas.replace(",", "."))));
-        } catch (DateTimeParseException e) {
-            throw new ExceptionErrorMessage("Data invalida.");
-        }
-
+    public void removeCartaoDePonto (int id) {
+        this.cartao.remove(id);
     }
 
-    public String getHorasNormaisTrabalhadas(String dataIncial, String dataFinal) throws ExceptionErrorMessage {
+    public void addRegistro(LocalDate data, double horas) {
+        this.cartao.add(new CartaoDePonto(data, horas));
+    }
+
+    public double getHorasNormaisTrabalhadas(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
 
         double horasAcumuladas = 0;
-        LocalDate dateInit;
-        LocalDate dateEnd;
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
 
-        int d = 0, m = 0, y, i = 0;
+        if (dataInicial.isEqual(dataFinal))
+            return horasAcumuladas;
 
-        for (String s : dataFinal.split("/")) {
-            if (i == 0) {
-                d = Integer.parseInt(s);
-                i++;
-            } else if (i == 1) {
-                m = Integer.parseInt(s);
-                i++;
-            } else {
-                y = Integer.parseInt(s);
-            }
-        }
+        if (dataInicial.isAfter(dataFinal)) {
+            ExceptionEmpregado e = new ExceptionEmpregado();
+            e.msgDataInicialPosteriorDataFinal();
 
-        if (m == 2 && d > 29) {
-            throw new ExceptionErrorMessage("Data final invalida.");
-        }
-
-        dateEnd = LocalDate.parse(dataFinal, formato);
-
-        try {
-            dateInit = LocalDate.parse(dataIncial, formato);
-        } catch (DateTimeParseException e) {
-            throw new ExceptionErrorMessage("Data inicial invalida.");
-        }
-
-        if (dateInit.isAfter(dateEnd)) {
-            throw new ExceptionErrorMessage("Data inicial nao pode ser posterior aa data final.");
-        }
-
-        if (dateInit.isEqual(dateEnd)) {
-            return "0";
+            return horasAcumuladas;
         }
 
         for (CartaoDePonto c : cartao) {
-            if (c.getData().isEqual(dateInit) ||
-                    (c.getData().isAfter(dateInit) && c.getData().isBefore(dateEnd))) {
+            if (c.getData().isEqual(dataInicial) ||
+                    (c.getData().isAfter(dataInicial) && c.getData().isBefore(dataFinal))) {
 
                 if (c.getHoras() > 8) {
                     horasAcumuladas += 8.0;
@@ -95,23 +58,22 @@ public class EmpregadoHorista extends Empregado {
             }
         }
 
-        if (horasAcumuladas != (int) horasAcumuladas)
-            return Double.toString(horasAcumuladas).replace(".", ",");
-
-        return Integer.toString((int) horasAcumuladas);
+        return horasAcumuladas;
     }
 
-    public String getHorasExtrasTrabalhadas(String dataIncial, String dataFinal) {
+    public double getHorasExtrasTrabalhadas(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
         double horasAcumuladas = 0;
 
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
+        if (dataInicial.isAfter(dataFinal)) {
+            ExceptionEmpregado e = new ExceptionEmpregado();
+            e.msgDataInicialPosteriorDataFinal();
 
-        LocalDate dateInit = LocalDate.parse(dataIncial, formato);
-        LocalDate dateEnd = LocalDate.parse(dataFinal, formato);
+            return horasAcumuladas;
+        }
 
         for (CartaoDePonto c : cartao) {
-            if (c.getData().isEqual(dateInit) ||
-                    (c.getData().isAfter(dateInit) && c.getData().isBefore(dateEnd))) {
+            if (c.getData().isEqual(dataInicial) ||
+                    (c.getData().isAfter(dataInicial) && c.getData().isBefore(dataFinal))) {
 
                 if (c.getHoras() > 8) {
                     horasAcumuladas += (c.getHoras() - 8.0);
@@ -119,19 +81,16 @@ public class EmpregadoHorista extends Empregado {
             }
         }
 
-        if (horasAcumuladas != (int) horasAcumuladas)
-            return Double.toString(horasAcumuladas).replace(".", ",");
-
-        return Integer.toString((int) horasAcumuladas);
+        return horasAcumuladas;
     }
 
     @Override
-    public void setSalario (String salario) {
+    public void setSalario (double salario) {
         this.salarioPorHora = salario;
     }
 
     @Override
-    public String getSalario() {
+    public double getSalario() {
         return this.salarioPorHora;
     }
 

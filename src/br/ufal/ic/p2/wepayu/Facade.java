@@ -1,14 +1,12 @@
 package br.ufal.ic.p2.wepayu;
 
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionErrorMessage;
+import br.ufal.ic.p2.wepayu.controller.FolhaDePagamentoController;
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.*;
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,20 +14,144 @@ public class Facade {
 
     public void zerarSistema() {
         EmpregadoController.empregados = new HashMap<String, Empregado>();
+        EmpregadoController.key = 0;
         System.out.println("-> Sistema zerado");
     }
 
-    public String getAtributoEmpregado(String emp, String atributo) throws ExceptionErrorMessage {
+    public void encerrarSistema() {
+        System.out.println("-> Sistema encerrado");
+    }
 
-        if (emp.isEmpty())
-            throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
+    //4 variaveis
+    public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws Exception {
 
-        Empregado e = EmpregadoController.getEmpregado(emp);
+        if (!Utils.validCriarEmpregado(nome, endereco, tipo, salario))
+            return null;
+
+        if (!Utils.validTipoNotComissionado(tipo))
+            return null;
+
+        double salarioFormato = Utils.validSalario(salario);
+
+        if (salarioFormato <= 0)
+            return null;
+
+        if (tipo.equals("assalariado")) {
+            return EmpregadoController.setEmpregado(new EmpregadoAssalariado(nome, endereco, salarioFormato));
+        } else if (tipo.equals("horista")) {
+            return EmpregadoController.setEmpregado(new EmpregadoHorista(nome, endereco, salarioFormato));
+        }
+
+        return null;
+    }
+
+    //5 variaveis
+    public String criarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) throws Exception {
+
+        if (!Utils.validCriarEmpregado(nome, endereco, tipo, salario, comissao))
+            return null;
+
+        if (!Utils.validTipoComissionado(tipo))
+            return null;
+
+        double salarioFormato = Utils.validSalario(salario);
+
+        if (salarioFormato <= 0)
+            return null;
+
+        double comissaoFormato = Utils.validComissao(comissao);
+
+        if (comissaoFormato <= 0)
+            return null;
+
+        return EmpregadoController.setEmpregado(new EmpregadoComissionado(nome, endereco, salarioFormato, comissaoFormato));
+    }
+
+    public void lancaCartao(String emp, String data, String horas) throws Exception {
+
+        Empregado e = Utils.validEmpregado(emp);
 
         if (e == null)
-            throw new ExceptionErrorMessage("Empregado nao existe.");
+            return;
+
+        if (Utils.validTipoEmpregado(e, "horista")) {
+            double horasFormato = Utils.validHoras(horas);
+            LocalDate dataFormato = Utils.validData(data, " ");
+
+            if (horasFormato <= 0 || dataFormato == null)
+                return;
+
+            ((EmpregadoHorista) e).addRegistro(dataFormato, horasFormato);
+        }
+    }
+
+    public void lancaVenda(String emp, String data, String valor) throws Exception {
+        Empregado e = Utils.validEmpregado(emp);
+
+        if (e == null)
+            return;
+
+        if (Utils.validTipoEmpregado(e, "comissionado")) {
+            double valorFormato = Utils.validValor(valor);
+            LocalDate dataFormato = Utils.validData(data, " ");
+
+            if (valorFormato <= 0 || dataFormato == null)
+                return;
+
+            ((EmpregadoComissionado) e).addVenda(dataFormato, valorFormato);
+        }
+    }
+
+    public void lancaTaxaServico(String membro, String data, String valor) throws Exception {
+
+        String id = Utils.validMembroSindicalizadoPeloID(membro);
+
+        if (id == null)
+            return;
+
+        double valorFormato = Utils.validValor(valor);
+        LocalDate dataFormato = Utils.validData(data, " ");
+
+        if (valorFormato <= 0 || dataFormato == null)
+            return;
+
+        EmpregadoController.getEmpregado(id).addTaxaServico(new TaxaServico(dataFormato, valorFormato));
+    }
+
+    public String getEmpregadoPorNome(String nome, int indice) throws Exception {
+
+        int count = 0;
+
+        for (Map.Entry<String, Empregado> entry : EmpregadoController.empregados.entrySet()) {
+
+            Empregado e = entry.getValue();
+
+            if (nome.contains(e.getNome()))
+                count++;
+
+            if (count == indice)
+                return entry.getKey();
+        }
+
+        ExceptionEmpregado ex = new ExceptionEmpregado();
+
+        ex.msgEmpregadoNaoExistePorNome();
+
+        return null;
+    }
+
+    public String getAtributoEmpregado(String emp, String atributo) throws Exception {
+
+        Empregado e = Utils.validEmpregado(emp);
+
+        if (e == null)
+            return null;
+
+        if (!Utils.validGetAtributo(emp, atributo))
+            return null;
 
         switch (atributo) {
+
             case "nome" -> {
                 return e.getNome();
             }
@@ -37,22 +159,17 @@ public class Facade {
                 return e.getTipo();
             }
             case "salario" -> {
-                String salario = e.getSalario();
-                if (salario.contains(",")) {
-                    return salario;
-                } else {
-                    return salario + ",00";
-                }
+                return Utils.convertDoubleToString(e.getSalario(), 2);
             }
             case "endereco" -> {
                 return e.getEndereco();
             }
             case "comissao" -> {
 
-                if (e instanceof EmpregadoComissionado)
-                    return ((EmpregadoComissionado) e).getTaxaDeComissao();
+                if (Utils.empregadoIsNotComissionado(e))
+                    return Utils.convertDoubleToString(((EmpregadoComissionado) e).getTaxaDeComissao(), 2);
 
-                throw new ExceptionErrorMessage("Empregado nao eh comissionado.");
+                return null;
             }
 
             case "metodoPagamento" -> {
@@ -62,9 +179,8 @@ public class Facade {
             case "banco", "agencia", "contaCorrente" -> {
                 MetodoPagamento metodoPagamento = e.getMetodoPagamento();
 
-                if (!(metodoPagamento instanceof  Banco)) {
-                    throw new ExceptionErrorMessage("Empregado nao recebe em banco.");
-                }
+                if (!Utils.metodoPagamentoIsBanco(metodoPagamento))
+                    return null;
 
                 if (atributo.equals("banco")) return ((Banco) metodoPagamento).getBanco();
                 if (atributo.equals("agencia")) return ((Banco) metodoPagamento).getAgencia();
@@ -80,417 +196,292 @@ public class Facade {
             case "idSindicato", "taxaSindical" -> {
                 MembroSindicalizado ms = e.getSindicalizado();
 
-                if (ms == null) throw new ExceptionErrorMessage("Empregado nao eh sindicalizado.");
+                if (!Utils.validSindicato(ms))
+                    return null;
 
                 if (atributo.equals("idSindicato")) return ms.getIdMembro();
 
                 return Utils.convertDoubleToString(e.getSindicalizado().getTaxaSindical(), 2);
             }
 
-            default -> throw new ExceptionErrorMessage("Atributo nao existe.");
         }
 
-
+        return null;
     }
 
-    public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws ExceptionErrorMessage {
+    public String getHorasNormaisTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception {
+        Empregado e = Utils.validEmpregado(emp);
 
-        if (nome.isEmpty())
-            throw new ExceptionErrorMessage("Nome nao pode ser nulo.");
+        if (e == null) return "0";
 
-        if (endereco.isEmpty())
-            throw new ExceptionErrorMessage("Endereco nao pode ser nulo.");
+        if (Utils.validTipoEmpregado(e, "horista")) {
 
-        if (tipo.equals("abc"))
-            throw new ExceptionErrorMessage("Tipo invalido.");
+            LocalDate dataFinalFormato = Utils.validData(dataFinal, " final ");
 
-        if (tipo.equals("comissionado"))
-            throw new ExceptionErrorMessage("Tipo nao aplicavel.");
+            if (dataFinalFormato == null)
+                return "0";
 
-        if (salario.isEmpty())
-            throw new ExceptionErrorMessage("Salario nao pode ser nulo.");
+            LocalDate dataInicialFormato = Utils.validData(dataInicial, " inicial ");
 
-        if (!salario.matches("[0-9,-]+"))
-            throw new ExceptionErrorMessage("Salario deve ser numerico.");
+            if (dataInicialFormato == null)
+                return "0";
 
-        if (salario.contains("-"))
-            throw new ExceptionErrorMessage("Salario deve ser nao-negativo.");
+            double horasTrabalhadas = ((EmpregadoHorista) e).getHorasNormaisTrabalhadas(dataInicialFormato, dataFinalFormato);
 
-        if (tipo.equals("assalariado")) {
-            return EmpregadoController.setEmpregado(new EmpregadoAssalariado(nome, endereco, salario));
-        } else if (tipo.equals("horista")) {
-            return EmpregadoController.setEmpregado(new EmpregadoHorista(nome, endereco, salario));
+            return Utils.convertDoubleToString(horasTrabalhadas);
         }
 
         return "0";
     }
 
-    public String criarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) throws ExceptionErrorMessage {
+    public String getHorasExtrasTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception {
+        Empregado e = Utils.validEmpregado(emp);
 
-        if (nome.isEmpty())
-            throw new ExceptionErrorMessage("Nome nao pode ser nulo.");
+        if (e == null) return null;
 
-        if (endereco.isEmpty())
-            throw new ExceptionErrorMessage("Endereco nao pode ser nulo.");
+        if (Utils.validTipoEmpregado(e, "horista")) {
 
-        if (tipo.equals("abc"))
-            throw new ExceptionErrorMessage("Tipo invalido.");
+            LocalDate dataInicialFormato = Utils.validData(dataInicial, " inicial ");
 
-        if (tipo.equals("horista") || tipo.equals("assalariado"))
-            throw new ExceptionErrorMessage("Tipo nao aplicavel.");
+            if (dataInicialFormato == null)
+                return "0,00";
 
-        if (salario.isEmpty())
-            throw new ExceptionErrorMessage("Salario nao pode ser nulo.");
+            LocalDate dataFinalFormato = Utils.validData(dataFinal, " final ");
 
-        if (!salario.matches("[0-9,-]+"))
-            throw new ExceptionErrorMessage("Salario deve ser numerico.");
+            if (dataFinalFormato == null)
+                return "0,00";
 
-        if (salario.contains("-"))
-            throw new ExceptionErrorMessage("Salario deve ser nao-negativo.");
+            double horasAcumuladas = ((EmpregadoHorista) e).getHorasExtrasTrabalhadas(dataInicialFormato, dataFinalFormato);
 
-        if (comissao.isEmpty())
-            throw new ExceptionErrorMessage("Comissao nao pode ser nula.");
-
-        if (!comissao.matches("[0-9,-]+"))
-            throw new ExceptionErrorMessage("Comissao deve ser numerica.");
-
-        if (comissao.contains("-"))
-            throw new ExceptionErrorMessage("Comissao deve ser nao-negativa.");
-
-        return EmpregadoController.setEmpregado(new EmpregadoComissionado(nome, endereco, salario, comissao));
-    }
-
-    public String getEmpregadoPorNome(String nome, int indice) throws ExceptionErrorMessage {
-
-        int count = 0;
-
-        for (Map.Entry<String, Empregado> entry : EmpregadoController.empregados.entrySet()) {
-
-            Empregado e = entry.getValue();
-
-            if (nome.contains(e.getNome()))
-                count++;
-
-            if (count == indice)
-                return entry.getKey();
+            return Utils.convertDoubleToString(horasAcumuladas);
         }
 
-        throw new ExceptionErrorMessage("Nao ha empregado com esse nome.");
+        return "0,00";
     }
 
-    public void removerEmpregado(String emp) throws ExceptionErrorMessage {
+    public String getVendasRealizadas(String emp, String dataInicial, String dataFinal) throws Exception {
+        Empregado e = Utils.validEmpregado(emp);
 
-        if (emp.isEmpty())
-            throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
+        if (e == null) return null;
 
-        Empregado e = EmpregadoController.getEmpregado(emp);
+        if (Utils.validTipoEmpregado(e, "comissionado")) {
+
+            LocalDate dataInicialFormato = Utils.validData(dataInicial, " inicial ");
+
+            if (dataInicialFormato == null)
+                return "0,00";
+
+            LocalDate dataFinalFormato = Utils.validData(dataFinal, " final ");
+
+            if (dataFinalFormato == null)
+                return "0,00";
+
+            double vendas = ((EmpregadoComissionado) e).getVendasRealizadas(dataInicialFormato, dataFinalFormato);
+
+            return Utils.convertDoubleToString(vendas, 2);
+        }
+
+        return "0,00";
+    }
+
+    public String getTaxasServico(String emp, String dataInicial, String dataFinal) throws Exception {
+
+        Empregado e = Utils.validEmpregado(emp);
 
         if (e == null)
-            throw new ExceptionErrorMessage("Empregado nao existe.");
+            return "0,00";
 
-        EmpregadoController.empregados.remove(emp);
-    }
+        LocalDate dataInicialFormato = Utils.validData(dataInicial, " inicial ");
 
-    public String getHorasNormaisTrabalhadas(String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
-        Empregado e = EmpregadoController.getEmpregado(emp);
+        if (dataInicialFormato == null)
+            return "0,00";
 
-        if (e instanceof EmpregadoHorista) {
-            return ((EmpregadoHorista) e).getHorasNormaisTrabalhadas(dataIncial, dataFinal);
+        LocalDate dataFinalFormato = Utils.validData(dataFinal, " final ");
+
+        if (dataFinalFormato == null)
+            return "0,00";
+
+        MembroSindicalizado m = Utils.validMembroSindicalizado(e);
+
+        if (m == null) {
+            return "0,00";
         }
 
-        throw new ExceptionErrorMessage("Empregado nao eh horista.");
+        double taxa = m.getTaxaServicos(dataInicialFormato, dataFinalFormato);
+
+        return Utils.convertDoubleToString(taxa, 2);
     }
 
-    public String getHorasExtrasTrabalhadas(String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
-        Empregado e = EmpregadoController.getEmpregado(emp);
+    // 3 variaveis
+    public void alteraEmpregado(String emp, String atributo, String valor) throws Exception {
 
-        if (e instanceof EmpregadoHorista) {
-            return ((EmpregadoHorista) e).getHorasExtrasTrabalhadas(dataIncial, dataFinal);
-        }
-
-        throw new ExceptionErrorMessage("Empregado nao eh horista.");
-    }
-
-    public void lancaCartao(String emp, String data, String horas) throws ExceptionErrorMessage {
-        Empregado e = EmpregadoController.getEmpregado(emp);
-
-        if (emp.isEmpty())
-            throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
+        Empregado e = Utils.validEmpregado(emp);
 
         if (e == null)
-            throw new ExceptionErrorMessage("Empregado nao existe.");
+            return;
 
-        if (e instanceof EmpregadoHorista) {
-            ((EmpregadoHorista) e).addRegistro(data, horas);
-        } else {
-            throw new ExceptionErrorMessage("Empregado nao eh horista.");
+        if (!Utils.validGetAtributo(emp, atributo)) {
+            return;
         }
-    }
-
-    public String getVendasRealizadas(String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
-        Empregado e = EmpregadoController.getEmpregado(emp);
-
-        if (e instanceof EmpregadoComissionado) {
-            return ((EmpregadoComissionado) e).getVendasRealizadas(dataIncial, dataFinal);
-        }
-
-        throw new ExceptionErrorMessage("Empregado nao eh comissionado.");
-    }
-
-    public void lancaVenda(String emp, String data, String horas) throws ExceptionErrorMessage {
-        Empregado e = EmpregadoController.getEmpregado(emp);
-
-        if (emp.equals(""))
-            throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
-
-        if (e == null)
-            throw new ExceptionErrorMessage("Empregado nao existe.");
-
-        if (e instanceof EmpregadoComissionado) {
-            ((EmpregadoComissionado) e).addVenda(data, horas);
-        } else {
-            throw new ExceptionErrorMessage("Empregado nao eh comissionado.");
-        }
-    }
-
-    public void alteraEmpregado(String emp, String atributo, String valor) throws ExceptionErrorMessage {
-        if(emp.isEmpty()) throw new ExceptionErrorMessage("Identificacao do empregado nao pode ser nula.");
-
-        Empregado e = EmpregadoController.getEmpregado(emp);
-
-        if(e == null) throw new ExceptionErrorMessage("Empregado nao existe.");
 
         switch (atributo) {
             case "nome" -> {
-                if(valor.isEmpty()) throw new ExceptionErrorMessage("Nome nao pode ser nulo.");
-
-                e.setNome(valor);
+                if (Utils.validNome(valor))
+                    e.setNome(valor);
             }
             case "endereco" -> {
-                if(valor.isEmpty()) throw new ExceptionErrorMessage("Endereco nao pode ser nulo.");
-
-                e.setEndereco(valor);
+                if (Utils.validEndereco(valor))
+                    e.setEndereco(valor);
             }
             case "salario" -> {
-                if (valor.isEmpty()) throw new ExceptionErrorMessage("Salario nao pode ser nulo.");
+                double salario = Utils.validSalario(valor);
 
-                try {
-                    double salario = Double.parseDouble(valor.replace(',', '.'));
+                if (salario < 0)
+                    return;
 
-                    if(salario <= 0.0) throw new ExceptionErrorMessage("Salario deve ser nao-negativo.");
-
-                } catch (NumberFormatException ex) {
-                    throw new ExceptionErrorMessage("Salario deve ser numerico.");
-                }
-
-                e.setSalario(valor);
+                e.setSalario(salario);
             }
             case "sindicalizado" -> {
-                if(!valor.equals("false") && !valor.equals("true")) throw new ExceptionErrorMessage("Valor deve ser true ou false.");
-
-                if (valor.equals("false")) {
+                if (Utils.validSindicalizado(valor)) {
                     e.setSindicalizado(null);
                 }
             }
             case "comissao" -> {
 
-                if(valor.isEmpty()) throw new ExceptionErrorMessage("Comissao nao pode ser nula.");
+                double comissao = Utils.validComissao(valor);
 
-                try {
-                    double comissao = Double.parseDouble(valor.replace(',', '.'));
+                if (comissao < 0)
+                    return;
 
-                    if(comissao <= 0.0) throw new ExceptionErrorMessage("Comissao deve ser nao-negativa.");
+                if (!Utils.empregadoIsNotComissionado(e))
+                    return;
 
-                } catch (NumberFormatException ex) {
-                    throw new ExceptionErrorMessage("Comissao deve ser numerica.");
-                }
-
-                if (!(e instanceof EmpregadoComissionado))
-                    throw new ExceptionErrorMessage("Empregado nao eh comissionado.");
-
-                ((EmpregadoComissionado) e).setTaxaDeComissao(valor);
+                ((EmpregadoComissionado) e).setTaxaDeComissao(comissao);
             }
             case "tipo" -> {
+
+                if (Utils.validAlterarTipo(e, valor)) {
+                    return;
+                }
+
                 String nome = e.getNome();
                 String endereco = e.getEndereco();
-                String salario = e.getSalario();
+                double salario = e.getSalario();
 
                 switch (valor) {
                     case "horista" -> EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, salario));
                     case "assalariado" ->
                             EmpregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, salario));
                     case "comissionado" ->
-                            EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, "0"));
-                    default -> throw new ExceptionErrorMessage("Tipo invalido.");
+                            EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, 0));
                 }
             }
 
             case "metodoPagamento" -> {
+
+                if (!Utils.validMetodoPagamento(valor))
+                    return;
+
                 if (valor.equals("correios")) e.setMetodoPagamento(new Correios());
 
-                else if(valor.equals("emMaos")) e.setMetodoPagamento(new EmMaos());
-
-                else throw new ExceptionErrorMessage("Metodo de pagamento invalido.");
+                else if (valor.equals("emMaos")) e.setMetodoPagamento(new EmMaos());
 
             }
-            default -> throw new ExceptionErrorMessage("Atributo nao existe.");
         }
     }
 
-    public void alteraEmpregado(String emp, String atributo, String valor, String sal) throws ExceptionErrorMessage {
-        Empregado e = EmpregadoController.getEmpregado(emp);
+    // 4 variaveis
+    public void alteraEmpregado(String emp, String atributo, String valor, String sal) throws Exception {
+        Empregado e = Utils.validEmpregado(emp);
 
+        if (e == null)
+            return;
 
+        if (!Utils.validGetAtributo(emp, atributo))
+            return;
 
         String nome = e.getNome();
         String endereco = e.getEndereco();
-        String salario = e.getSalario();
 
-        if (valor.equals("comissionado"))
-            EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, sal));
-        else if(valor.equals("horista"))
-            EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, sal));
+        if (valor.equals("comissionado")) {
+            double salario = e.getSalario();
+            double comissao = Utils.validComissao(sal);
+
+            if (comissao < 0)
+                return;
+
+            EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, comissao));
+
+        } else if (valor.equals("horista")) {
+            double novoSalario = Utils.validSalario(sal);
+
+            if (novoSalario < 0)
+                return;
+
+            EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, novoSalario));
+        }
     }
 
-    public void alteraEmpregado(String emp, String atributo, String valor, String idSindicato, String taxaSindical) throws ExceptionErrorMessage {
-        if(idSindicato.isEmpty()) throw new ExceptionErrorMessage("Identificacao do sindicato nao pode ser nula.");
+    // 5 variaveis
+    public void alteraEmpregado(String emp, String atributo, String valor, String idSindicato, String taxaSindical) throws Exception {
 
-        if(taxaSindical.isEmpty()) throw new ExceptionErrorMessage("Taxa sindical nao pode ser nula.");
+        if (Utils.validIdSindical(idSindicato))
+            return;
 
-        try {
-            double taxaSindicalNumber = Double.parseDouble(taxaSindical.replace(",", "."));
+        double taxaSindicalNumber = Utils.validTaxaSindical(taxaSindical);
 
-            if(taxaSindicalNumber <= 0.0) throw new ExceptionErrorMessage("Taxa sindical deve ser nao-negativa.");
-
-        } catch (NumberFormatException ex) {
-            throw new ExceptionErrorMessage("Taxa sindical deve ser numerica.");
-        }
+        if (taxaSindicalNumber <= 0.0)
+            return;
 
         if (atributo.equals("sindicalizado") && valor.equals("true")) {
-            boolean flag = true;
 
-            for (Map.Entry<String, Empregado> entry : EmpregadoController.empregados.entrySet()) {
-                MembroSindicalizado m = entry.getValue().getSindicalizado();
+            if (Utils.sindicalizarEmpregado(idSindicato)) {
+                Empregado e = Utils.validEmpregado(emp);
 
-                if (m != null)
-                    if (m.getIdMembro().equals(idSindicato))
-                        flag = false;
-            }
+                if (e == null) return;
 
-            if (!flag)
-                throw new ExceptionErrorMessage("Ha outro empregado com esta identificacao de sindicato");
-
-            Empregado e = EmpregadoController.getEmpregado(emp);
-            e.setSindicalizado(new MembroSindicalizado(idSindicato, Double.parseDouble(taxaSindical.replace(",", "."))));
-        }
-    }
-
-    public void alteraEmpregado(String emp, String atributo, String tipo, String banco, String agencia, String contaCorrente) throws ExceptionErrorMessage {
-        Empregado e = EmpregadoController.getEmpregado(emp);
-
-        if (!tipo.equals("banco")) throw new ExceptionErrorMessage("Não implementado");
-
-        if(banco.isEmpty()) throw new ExceptionErrorMessage("Banco nao pode ser nulo.");
-        if(agencia.isEmpty()) throw new ExceptionErrorMessage("Agencia nao pode ser nulo.");
-        if(contaCorrente.isEmpty()) throw new ExceptionErrorMessage("Conta corrente nao pode ser nulo.");
-
-
-        e.setMetodoPagamento(new Banco(banco, agencia, contaCorrente));
-    }
-
-    public void lancaTaxaServico(String membro, String data, String valor) throws ExceptionErrorMessage {
-
-        double value = Double.parseDouble(valor.replace(",", "."));
-
-        if (value <= 0)
-            throw new ExceptionErrorMessage("Valor deve ser positivo.");
-
-        if (membro.isEmpty())
-            throw new ExceptionErrorMessage("Identificacao do membro nao pode ser nula.");
-
-        String id = EmpregadoController.getEmpregadoPorIdSindical(membro);
-
-        if (id == null)
-            throw new ExceptionErrorMessage("Membro nao existe.");
-
-        try {
-            DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
-            LocalDate date = LocalDate.parse(data, formato);
-            EmpregadoController.getEmpregado(id).addTaxaServico(new TaxaServico(date, value));
-        } catch (DateTimeParseException e) {
-            throw new ExceptionErrorMessage("Data invalida.");
-        }
-
-    }
-
-    public String getTaxasServico(String emp, String dataIncial, String dataFinal) throws ExceptionErrorMessage {
-
-        LocalDate dateInit;
-        LocalDate dateEnd;
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
-
-        int d = 0, m = 0, y, i = 0;
-
-        for (String s : dataFinal.split("/")) {
-            if (i == 0) {
-                d = Integer.parseInt(s);
-                i++;
-            } else if (i == 1) {
-                m = Integer.parseInt(s);
-                i++;
-            } else {
-                y = Integer.parseInt(s);
+                e.setSindicalizado(new MembroSindicalizado(idSindicato, taxaSindicalNumber));
             }
         }
+    }
 
-        if (m == 2 && d > 29) {
-            throw new ExceptionErrorMessage("Data final invalida.");
-        }
-
-        dateEnd = LocalDate.parse(dataFinal, formato);
-
-        try {
-            dateInit = LocalDate.parse(dataIncial, formato);
-        } catch (DateTimeParseException e) {
-            throw new ExceptionErrorMessage("Data inicial invalida.");
-        }
-
-        if (dateInit.isAfter(dateEnd)) {
-            throw new ExceptionErrorMessage("Data inicial nao pode ser posterior aa data final.");
-        }
-
-        if (dateInit.isEqual(dateEnd))
-            return "0,00";
-
-        Empregado e = EmpregadoController.getEmpregado(emp);
+    // 6 variaveis
+    public void alteraEmpregado(String emp, String atributo, String tipo, String banco, String agencia, String contaCorrente) throws Exception {
+        Empregado e = Utils.validEmpregado(emp);
 
         if (e == null)
-            return "0,00";
+            return;
 
-        MembroSindicalizado memSind = e.getSindicalizado();
+        if (!Utils.validGetAtributo(emp, atributo))
+            return;
 
-        if (memSind == null)
-            throw new ExceptionErrorMessage("Empregado nao eh sindicalizado.");
-
-        double countTaxas = 0;
-
-        ArrayList<TaxaServico> taxas = memSind.getTaxaServicos();
-
-        if (taxas == null)
-            return "0,00";
-
-        for (TaxaServico t : taxas) {
-            if (t.getData().isEqual(dateInit) ||
-                    (t.getData().isAfter(dateInit) && t.getData().isBefore(dateEnd))) {
-                countTaxas += t.getValor();
-            }
-        }
-
-        return String.format("%.2f", countTaxas).replace(".", ",");
+        if (Utils.validBanco(banco, agencia, contaCorrente))
+            e.setMetodoPagamento(new Banco(banco, agencia, contaCorrente));
     }
 
-    public String totalFolha(String data){
-        return "0,00";
+    public void removerEmpregado(String emp) throws Exception {
+
+        Empregado e = Utils.validEmpregado(emp);
+
+        if (e == null)
+            return;
+
+        EmpregadoController.empregados.remove(emp);
+    }
+
+    public String totalFolha(String data) throws Exception {
+
+        FolhaDePagamento folha = new FolhaDePagamento(   EmpregadoController.getEmpregadoHoristas(),
+                                        EmpregadoController.getEmpregadoComissionado(),
+                                        EmpregadoController.getEmpregadoAssalariado());
+
+        LocalDate dataFormato = Utils.validData(data, " ");
+
+        folha.rodaFolha(dataFormato);
+
+        double total = folha.totalFolhaSalarioBruto();
+
+        return Utils.convertDoubleToString(total, 2);
     }
 
 }
