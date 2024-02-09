@@ -112,4 +112,10 @@ public class EmpregadoHorista extends Empregado {
     public String getTipo() {
         return "horista";
     }
+
+    @Override
+    public String toString() {
+
+        return "EmpregadoHorista{" + this.getNome() + '}';
+    }
 }

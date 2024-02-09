@@ -6,6 +6,10 @@ import java.util.ArrayList;
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
+
+//    Claudia Raia                            15     2        180,00     88,40           91,60 Banco do Brasil, Ag. 1591-1 CC 51002-2
+//    Claudia Raia                            15     2        180,00       88,40          91,60 Banco do Brasil, Ag. 1591-1 CC 51002-2
+
     public static void main(String[] args) {
 
         String facade = "br.ufal.ic.p2.wepayu.Facade";

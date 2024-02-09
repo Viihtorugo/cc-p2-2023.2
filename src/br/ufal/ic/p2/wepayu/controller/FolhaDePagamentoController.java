@@ -14,7 +14,8 @@ public class FolhaDePagamentoController {
     }
 
     public static void restartCountFriday(LocalDate data) {
-        if (countFriday % 3 == 0 && data.getDayOfWeek() == DayOfWeek.FRIDAY) {
+        System.out.println(countFriday);
+        if (countFriday % 5 == 0 && data.getDayOfWeek() == DayOfWeek.FRIDAY) {
             countFriday = 1;
         }
     }

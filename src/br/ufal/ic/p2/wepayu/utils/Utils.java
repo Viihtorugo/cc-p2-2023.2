@@ -11,10 +11,30 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Map;
+import java.util.*;
 
 public class Utils {
 
+    public static Map<String, String> sortHashMap(HashMap<String, String> hashMap) {
+
+        List<Map.Entry<String, String>> entryList = new ArrayList<>(hashMap.entrySet());
+
+        entryList.sort(Map.Entry.comparingByValue());
+
+        Map<String, String> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : entryList) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
+    }
+
+
+    
+    public static void initSystem () {
+        EmpregadoController.empregados = new HashMap<>();
+        EmpregadoController.key = 0;
+    }
     public static void deleteFilesXML () {
 
         for (int i = 1; i <= 1000; i++) {
@@ -27,6 +47,18 @@ public class Utils {
             }
         }
     }
+
+    public static void deleteFolhas () {
+        File[] folhas = new File("./").listFiles();
+
+        for (File f : folhas) {
+            if (f.getName().endsWith(".txt")) {
+                // Excluir o arquivo
+                f.delete();
+            }
+        }
+    }
+
     public static boolean validNome (String nome) throws Exception {
 
         if (nome.isEmpty()) {
@@ -414,6 +446,12 @@ public class Utils {
         return horasFormato;
     }
 
+    public static String invertFormatData(String data) {
+        String[] s = data.split("/");
+
+        return s[2] + "-" + s[1] + "-" + s[0];
+    }
+
     public static LocalDate validData(String data, String tipo) throws Exception {
 
         String[] blocos = data.split("/");
@@ -421,7 +459,6 @@ public class Utils {
         int d = Integer.parseInt(blocos[0]);
         int m = Integer.parseInt(blocos[1]);
         int y = Integer.parseInt(blocos[2]);
-
 
         if (m > 12 || m < 1) {
             ExceptionConversao ex = new ExceptionConversao();
@@ -494,5 +531,52 @@ public class Utils {
         }
 
         return Double.parseDouble(value.replace(",", "."));
+    }
+
+    public static String padLeft(String value, int length) {
+
+        if (value.length() >= length) {
+            return value;
+        }
+
+        int padLength = length - value.length();
+
+        return " ".repeat(padLength) + value;
+    }
+
+    public static String padLeft(String value, int length, String padChar) {
+
+        if (value.length() >= length) {
+            return value;
+        }
+
+        int padLength = length - value.length();
+
+        return padChar.repeat(padLength) + value;
+    }
+
+
+    public static String padRight(String value, int length) {
+
+        if (value.length() >= length) {
+            return value;
+        }
+
+        int padLength = length - value.length();
+
+        return value + " ".repeat(padLength);
+    }
+
+    public static String padRight(String value, int length, String padChar) {
+
+        if (value.length() >= length) {
+            return value;
+        }
+
+        int padLength = length - value.length();
+
+        System.out.println(padLength);
+
+        return value + padChar.repeat(padLength);
     }
 }

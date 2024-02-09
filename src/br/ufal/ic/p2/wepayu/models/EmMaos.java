@@ -8,6 +8,6 @@ public class EmMaos extends MetodoPagamento {
 
     @Override
     public String getMetodoPagamento() {
-        return "emMaos";
+        return "Em maos";
     }
 }

@@ -1,8 +1,5 @@
 package br.ufal.ic.p2.wepayu;
 
-import br.ufal.ic.p2.wepayu.database.EmpregadoAssalariadoXML;
-import br.ufal.ic.p2.wepayu.database.EmpregadoComissionadoXML;
-import br.ufal.ic.p2.wepayu.database.EmpregadoHoristaXML;
 import br.ufal.ic.p2.wepayu.database.EmpregadoXML;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.*;
@@ -11,16 +8,21 @@ import br.ufal.ic.p2.wepayu.utils.Utils;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Facade {
 
+    public Facade() {
+        EmpregadoXML xml = new EmpregadoXML();
+        EmpregadoController.empregados = xml.readEmpregados();
+    }
+
     public void zerarSistema() {
-        EmpregadoController.empregados = new HashMap<>();
-        EmpregadoController.key = 0;
-        System.out.println("-> Sistema zerado");
+        Utils.initSystem();
         Utils.deleteFilesXML();
+        Utils.deleteFolhas();
+        System.out.println("-> Sistema zerado");
+
     }
 
     public void encerrarSistema() {
@@ -128,10 +130,6 @@ public class Facade {
     }
 
     public String getEmpregadoPorNome(String nome, int indice) throws Exception {
-
-        EmpregadoXML xml = new EmpregadoXML();
-
-        EmpregadoController.empregados = xml.readEmpregados();
 
         int count = 0;
 
@@ -495,13 +493,26 @@ public class Facade {
                                         EmpregadoController.getEmpregadoComissionado(),
                                         EmpregadoController.getEmpregadoAssalariado());
 
-        LocalDate dataFormato = Utils.validData(data, " ");
+        LocalDate dataFormato = Utils.validData(data, "");
 
-        folha.rodaFolha(dataFormato);
+        folha.construirFolha(dataFormato);
 
-        double total = folha.totalFolhaSalarioBruto();
+        double total = folha.totalFolha();
 
         return Utils.convertDoubleToString(total, 2);
+    }
+
+    public void rodaFolha(String data, String saida) throws Exception {
+
+        SistemaFolha folha = new SistemaFolha(   EmpregadoController.getEmpregadoHoristas(),
+                EmpregadoController.getEmpregadoComissionado(),
+                EmpregadoController.getEmpregadoAssalariado());
+
+
+        LocalDate dataFormato = Utils.validData(data, "");
+        folha.construirFolha(dataFormato);
+
+        folha.fileFolha(dataFormato, saida);
     }
 
 }

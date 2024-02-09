@@ -8,6 +8,6 @@ public class Correios extends MetodoPagamento {
 
     @Override
     public String getMetodoPagamento() {
-        return "correios";
+        return "Correios";
     }
 }

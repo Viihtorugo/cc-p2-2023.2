@@ -14,7 +14,7 @@ import java.util.*;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class SistemaFolha {
+public class SistemaFolhaDuplicado {
     private HashMap<String, EmpregadoHorista> empregadosHoristas;
     private HashMap<String, EmpregadoComissionado> empregadosComissionados;
     private HashMap<String, EmpregadoAssalariado> empregadosAssalariados;
@@ -23,9 +23,9 @@ public class SistemaFolha {
     private HashMap<String, Double> salarioBrutoComissionados;
     private HashMap<String, Double> salarioBrutoAssalariados;
 
-    public SistemaFolha(HashMap<String, EmpregadoHorista> empregadosHoristas,
-                                 HashMap<String, EmpregadoComissionado> empregadosComissionados,
-                                 HashMap<String, EmpregadoAssalariado> empregadosAssalariados) {
+    public SistemaFolhaDuplicado(HashMap<String, EmpregadoHorista> empregadosHoristas,
+                        HashMap<String, EmpregadoComissionado> empregadosComissionados,
+                        HashMap<String, EmpregadoAssalariado> empregadosAssalariados) {
 
         this.empregadosHoristas = empregadosHoristas;
         this.empregadosComissionados = empregadosComissionados;
@@ -36,7 +36,7 @@ public class SistemaFolha {
         this.salarioBrutoAssalariados = new HashMap<String, Double>();
     }
 
-    public void construirFolha(LocalDate data) throws Exception {
+    public double totalFolha(LocalDate data) throws Exception {
 
         for (Map.Entry<String, EmpregadoHorista> e : this.empregadosHoristas.entrySet()) {
 
@@ -57,8 +57,8 @@ public class SistemaFolha {
             }
         }
 
-        if (data.getDayOfWeek() == DayOfWeek.FRIDAY)
-            FolhaDePagamentoController.incrementCountFriday(data);
+
+        FolhaDePagamentoController.incrementCountFriday(data);
 
         for (Map.Entry<String, EmpregadoComissionado> e : this.empregadosComissionados.entrySet()) {
             EmpregadoComissionado empregadoComissionado = e.getValue();
@@ -91,10 +91,6 @@ public class SistemaFolha {
             }
         }
 
-        FolhaDePagamentoController.restartCountFriday(data);
-    }
-
-    public double totalFolha () {
         double total = 0;
 
         for (Map.Entry<String, Double> s : this.salarioBrutoHoristas.entrySet())
@@ -106,14 +102,12 @@ public class SistemaFolha {
         for (Map.Entry<String, Double> s : this.salarioBrutoAssalariados.entrySet())
             total += s.getValue();
 
+        FolhaDePagamentoController.restartCountFriday(data);
 
         return total;
     }
 
-
-    public void fileFolha(LocalDate data, String saida) {
-
-        double total = 0;
+    public void fileFolha(LocalDate data, String saida, double total) {
 
         try {
 
@@ -186,8 +180,6 @@ public class SistemaFolha {
             line += Utils.padLeft(Utils.convertDoubleToString(totalSalarioLiquido, 2), 16) + "\n";
             escritor.write(line);
 
-            total += totalSalarioBruto;
-
             escritor.write("\n");
 
             FolhaDePagamento.writeEmpregadoHeader(escritor, "ASSALARIADOS");
@@ -245,8 +237,6 @@ public class SistemaFolha {
             footer += Utils.padLeft(Utils.convertDoubleToString(totalSalarioLiquido, 2), 16) + "\n";
             escritor.write(footer);
 
-            total += totalSalarioBruto;
-
             escritor.write("\n");
 
             FolhaDePagamento.writeEmpregadoHeader(escritor, "COMISSIONADOS");
@@ -284,8 +274,6 @@ public class SistemaFolha {
             footer += Utils.padLeft(Utils.convertDoubleToString(totalSalarioBruto, 2), 14);
             footer += Utils.padLeft(Utils.convertDoubleToString(totalDescontos, 2), 10);
             footer += Utils.padLeft(Utils.convertDoubleToString(totalSalarioLiquido, 2), 16) + "\n";
-
-            total += totalSalarioFixo;
 
             escritor.write(footer);
 

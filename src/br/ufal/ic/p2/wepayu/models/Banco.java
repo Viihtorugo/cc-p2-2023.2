@@ -41,6 +41,6 @@ public class Banco extends MetodoPagamento {
 
     @Override
     public String getMetodoPagamento() {
-        return "banco";
+        return getBanco() + "," + " Ag. " + getAgencia() + " CC " + getContaCorrente();
     }
 }
