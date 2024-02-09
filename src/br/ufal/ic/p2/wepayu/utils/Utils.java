@@ -6,6 +6,7 @@ import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionMetodosDePagamento;
 import br.ufal.ic.p2.wepayu.models.*;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,18 @@ import java.util.Map;
 
 public class Utils {
 
+    public static void deleteFilesXML () {
+
+        for (int i = 1; i <= 1000; i++) {
+            File file = new File( i + ".xml" );
+
+            if (file.exists()) {
+                file.delete();
+            } else {
+                return;
+            }
+        }
+    }
     public static boolean validNome (String nome) throws Exception {
 
         if (nome.isEmpty()) {

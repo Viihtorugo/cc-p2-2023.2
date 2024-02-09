@@ -7,8 +7,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.FileWriter;
+import java.io.IOException;
 
-public class FolhaDePagamento {
+public class SistemaFolha {
     private HashMap<String, EmpregadoHorista> empregadosHoristas;
     private HashMap<String, EmpregadoComissionado> empregadosComissionados;
     private HashMap<String, EmpregadoAssalariado> empregadosAssalariados;
@@ -17,9 +19,9 @@ public class FolhaDePagamento {
     private HashMap<String, Double> salarioBrutoComissionados;
     private HashMap<String, Double> salarioBrutoAssalariados;
 
-    public FolhaDePagamento(HashMap<String, EmpregadoHorista> empregadosHoristas,
-                            HashMap<String, EmpregadoComissionado> empregadosComissionados,
-                            HashMap<String, EmpregadoAssalariado> empregadosAssalariados) {
+    public SistemaFolha(HashMap<String, EmpregadoHorista> empregadosHoristas,
+                        HashMap<String, EmpregadoComissionado> empregadosComissionados,
+                        HashMap<String, EmpregadoAssalariado> empregadosAssalariados) {
 
         this.empregadosHoristas = empregadosHoristas;
         this.empregadosComissionados = empregadosComissionados;
@@ -86,6 +88,26 @@ public class FolhaDePagamento {
                 this.salarioBrutoAssalariados.put(e.getKey(), 0.0);
             }
         }
+
+
+        if (data.getDayOfWeek() == DayOfWeek.FRIDAY || data.getDayOfMonth() == data.lengthOfMonth()) {
+            String dataString = data.toString();
+
+            try {
+                FileWriter escritor = new FileWriter("folha-" + dataString + ".txt");
+
+                escritor.write("FOLHA DE PAGAMENTO DO DIA " + dataString);
+
+                // Fechar o escritor
+                escritor.close();
+
+                System.out.println("Arquivo criado com sucesso!");
+
+            } catch (IOException e) {
+                System.out.println("Erro ao criar o arquivo: " + e.getMessage());
+            }
+        }
+
 
     }
 

@@ -1,6 +1,7 @@
 package br.ufal.ic.p2.wepayu.models;
 
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
+import br.ufal.ic.p2.wepayu.utils.Utils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -10,25 +11,19 @@ public class EmpregadoHorista extends Empregado {
     private double salarioPorHora;
     private ArrayList<CartaoDePonto> cartao;
 
+    public EmpregadoHorista() {
+
+    }
+
     public EmpregadoHorista(String nome, String endereco, double salarioPorHora) {
         super(nome, endereco);
         this.salarioPorHora = salarioPorHora;
         this.cartao = new ArrayList<CartaoDePonto>();
     }
 
-    public boolean checkDateCartaoDePonto (LocalDate date) {
-        for (int i = 0; i < this.cartao.size(); i++)
-           if (date.isEqual(this.cartao.get(i).getData()))
-               return true;
+    public void addRegistro(String data, double horas) {
 
-        return false;
-    }
 
-    public void removeCartaoDePonto (int id) {
-        this.cartao.remove(id);
-    }
-
-    public void addRegistro(LocalDate data, double horas) {
         this.cartao.add(new CartaoDePonto(data, horas));
     }
 
@@ -47,15 +42,21 @@ public class EmpregadoHorista extends Empregado {
         }
 
         for (CartaoDePonto c : cartao) {
-            if (c.getData().isEqual(dataInicial) ||
-                    (c.getData().isAfter(dataInicial) && c.getData().isBefore(dataFinal))) {
 
-                if (c.getHoras() > 8) {
-                    horasAcumuladas += 8.0;
-                } else {
-                    horasAcumuladas += c.getHoras();
+            LocalDate dataFormato = Utils.validData(c.getData(), "");
+
+            if (dataFormato != null) {
+                if (dataFormato.isEqual(dataInicial) ||
+                        (dataFormato.isAfter(dataInicial) && dataFormato.isBefore(dataFinal))) {
+
+                    if (c.getHoras() > 8) {
+                        horasAcumuladas += 8.0;
+                    } else {
+                        horasAcumuladas += c.getHoras();
+                    }
                 }
             }
+
         }
 
         return horasAcumuladas;
@@ -72,11 +73,16 @@ public class EmpregadoHorista extends Empregado {
         }
 
         for (CartaoDePonto c : cartao) {
-            if (c.getData().isEqual(dataInicial) ||
-                    (c.getData().isAfter(dataInicial) && c.getData().isBefore(dataFinal))) {
 
-                if (c.getHoras() > 8) {
-                    horasAcumuladas += (c.getHoras() - 8.0);
+            LocalDate dataFormato = Utils.validData(c.getData(), "");
+
+            if (dataFormato != null) {
+                if (dataFormato.isEqual(dataInicial) ||
+                        (dataFormato.isAfter(dataInicial) && dataFormato.isBefore(dataFinal))) {
+
+                    if (c.getHoras() > 8) {
+                        horasAcumuladas += (c.getHoras() - 8.0);
+                    }
                 }
             }
         }
@@ -84,8 +90,16 @@ public class EmpregadoHorista extends Empregado {
         return horasAcumuladas;
     }
 
+    public ArrayList<CartaoDePonto> getCartao() {
+        return this.cartao;
+    }
+
+    public void setCartao(ArrayList<CartaoDePonto> cartao) {
+        this.cartao = cartao;
+    }
+
     @Override
-    public void setSalario (double salario) {
+    public void setSalario(double salario) {
         this.salarioPorHora = salario;
     }
 

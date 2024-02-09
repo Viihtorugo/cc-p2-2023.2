@@ -3,11 +3,12 @@ package br.ufal.ic.p2.wepayu.models;
 public abstract class Empregado {
     private String nome;
     private String endereco;
-
     private MembroSindicalizado sindicalizado;
-
     private MetodoPagamento metodoPagamento;
 
+    public Empregado () {
+
+    }
 
     public Empregado(String nome, String endereco) {
         this.nome = nome;

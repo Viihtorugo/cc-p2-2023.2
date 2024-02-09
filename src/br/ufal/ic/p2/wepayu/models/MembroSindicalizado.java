@@ -1,6 +1,7 @@
 package br.ufal.ic.p2.wepayu.models;
 
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
+import br.ufal.ic.p2.wepayu.utils.Utils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,6 +10,10 @@ public class MembroSindicalizado {
     private String idMembro;
     private double taxaSindical;
     private ArrayList<TaxaServico> taxaServicos;
+
+    public MembroSindicalizado () {
+
+    }
 
     public MembroSindicalizado(String idMembro, double taxaSindical) {
         this.idMembro = idMembro;
@@ -32,13 +37,22 @@ public class MembroSindicalizado {
         }
 
         for (TaxaServico t : this.taxaServicos) {
-            if (t.getData().isEqual(dataInicial) ||
-                    (t.getData().isAfter(dataInicial) && t.getData().isBefore(dataFinal))) {
-                countTaxas += t.getValor();
+
+            LocalDate dataFormato = Utils.validData(t.getData(), "");
+
+            if (dataFormato != null) {
+                if (dataFormato.isEqual(dataInicial) ||
+                        (dataFormato.isAfter(dataInicial) && dataFormato.isBefore(dataFinal))) {
+                    countTaxas += t.getValor();
+                }
             }
         }
 
         return countTaxas;
+    }
+
+    public void addTaxaServico (TaxaServico taxaServico) {
+        this.taxaServicos.add(taxaServico);
     }
 
     public double getTaxaSindical() {
@@ -49,7 +63,19 @@ public class MembroSindicalizado {
         return this.idMembro;
     }
 
-    public void addTaxaServico (TaxaServico taxaServico) {
-        this.taxaServicos.add(taxaServico);
+    public void setIdMembro(String idMembro) {
+        this.idMembro = idMembro;
+    }
+
+    public void setTaxaServicos(ArrayList<TaxaServico> taxaServicos) {
+        this.taxaServicos = taxaServicos;
+    }
+
+    public void setTaxaSindical(double taxaSindical) {
+        this.taxaSindical = taxaSindical;
+    }
+
+    public ArrayList<TaxaServico> getTaxaServicos() {
+        return taxaServicos;
     }
 }

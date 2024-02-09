@@ -1,4 +1,7 @@
 package br.ufal.ic.p2.wepayu.controller;
+import br.ufal.ic.p2.wepayu.database.EmpregadoAssalariadoXML;
+import br.ufal.ic.p2.wepayu.database.EmpregadoComissionadoXML;
+import br.ufal.ic.p2.wepayu.database.EmpregadoHoristaXML;
 import br.ufal.ic.p2.wepayu.models.*;
 
 import java.util.HashMap;
@@ -10,8 +13,9 @@ public class EmpregadoController {
 
     public static String setEmpregado(Empregado e) {
         key++;
-        empregados.put(Integer.toString(key),e);
-        return Integer.toString(key);
+        String id = Integer.toString(key);
+        empregados.put(id, e);
+        return id;
     }
 
     public static Empregado getEmpregado(String key) {
@@ -82,9 +86,7 @@ public class EmpregadoController {
         return null;
     }
 
-    public static void setValue(String key, Empregado e) {
-        empregados.replace(key, e);
-    }
+    public static void setValue(String key, Empregado e) { empregados.replace(key, e); }
 
 
 }

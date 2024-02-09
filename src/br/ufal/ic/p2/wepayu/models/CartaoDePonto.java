@@ -4,19 +4,31 @@ import java.time.LocalDate;
 
 public class CartaoDePonto {
 
-    private LocalDate data;
+    private String data;
     private Double horas;
 
-    public CartaoDePonto (LocalDate data, Double horas) {
+    public CartaoDePonto() {
+
+    }
+
+    public CartaoDePonto(String data, Double horas) {
         this.data = data;
         this.horas = horas;
     }
 
-    public LocalDate getData() {
+    public String getData() {
         return this.data;
     }
 
     public Double getHoras() {
         return this.horas;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public void setHoras(Double horas) {
+        this.horas = horas;
     }
 }

@@ -1,12 +1,16 @@
 package br.ufal.ic.p2.wepayu.models;
 
-import java.time.LocalDate;
+import java.lang.String;
 
 public class CartaoDeVenda {
-    private LocalDate data;
+    private String data;
     private Double horas;
 
-    public CartaoDeVenda (LocalDate data, Double horas) {
+    public CartaoDeVenda () {
+
+    }
+
+    public CartaoDeVenda (String data, Double horas) {
         this.data = data;
         this.horas = horas;
     }
@@ -15,7 +19,15 @@ public class CartaoDeVenda {
         return horas;
     }
 
-    public LocalDate getData() {
+    public String getData() {
         return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public void setHoras(Double horas) {
+        this.horas = horas;
     }
 }

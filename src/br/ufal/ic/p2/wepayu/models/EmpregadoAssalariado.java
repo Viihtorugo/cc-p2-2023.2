@@ -4,19 +4,13 @@ public class EmpregadoAssalariado extends Empregado {
 
     private double salarioMensal;
 
+    public EmpregadoAssalariado () {
+
+    }
+
     public EmpregadoAssalariado(String nome, String endereco, double salarioMensal) {
         super(nome, endereco);
         this.salarioMensal = salarioMensal;
-    }
-
-    public double getSalarioMensal() {
-        return salarioMensal;
-    }
-
-
-    @Override
-    public void setSalario(double salario) {
-        this.salarioMensal = salario;
     }
 
     public double getSalario () {
@@ -24,7 +18,28 @@ public class EmpregadoAssalariado extends Empregado {
     }
 
     @Override
+    public MembroSindicalizado getSindicalizado() {
+        return super.getSindicalizado();
+    }
+
+    @Override
+    public void setSalario(double salario) {
+        this.salarioMensal = salario;
+    }
+
+    @Override
     public String getTipo() {
         return "assalariado";
     }
+
+    @Override
+    public MetodoPagamento getMetodoPagamento() {
+        return super.getMetodoPagamento();
+    }
+
+    @Override
+    public String getEndereco() {
+        return super.getEndereco();
+    }
+
 }

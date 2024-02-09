@@ -1,11 +1,15 @@
 package br.ufal.ic.p2.wepayu;
 
-import br.ufal.ic.p2.wepayu.controller.FolhaDePagamentoController;
+import br.ufal.ic.p2.wepayu.database.EmpregadoAssalariadoXML;
+import br.ufal.ic.p2.wepayu.database.EmpregadoComissionadoXML;
+import br.ufal.ic.p2.wepayu.database.EmpregadoHoristaXML;
+import br.ufal.ic.p2.wepayu.database.EmpregadoXML;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.*;
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,13 +17,18 @@ import java.util.Map;
 public class Facade {
 
     public void zerarSistema() {
-        EmpregadoController.empregados = new HashMap<String, Empregado>();
+        EmpregadoController.empregados = new HashMap<>();
         EmpregadoController.key = 0;
         System.out.println("-> Sistema zerado");
+        Utils.deleteFilesXML();
     }
 
     public void encerrarSistema() {
         System.out.println("-> Sistema encerrado");
+
+        EmpregadoXML xml = new EmpregadoXML();
+
+        xml.save(EmpregadoController.empregados);
     }
 
     //4 variaveis
@@ -81,7 +90,7 @@ public class Facade {
             if (horasFormato <= 0 || dataFormato == null)
                 return;
 
-            ((EmpregadoHorista) e).addRegistro(dataFormato, horasFormato);
+            ((EmpregadoHorista) e).addRegistro(data, horasFormato);
         }
     }
 
@@ -98,7 +107,7 @@ public class Facade {
             if (valorFormato <= 0 || dataFormato == null)
                 return;
 
-            ((EmpregadoComissionado) e).addVenda(dataFormato, valorFormato);
+            ((EmpregadoComissionado) e).addVenda(data, valorFormato);
         }
     }
 
@@ -115,10 +124,14 @@ public class Facade {
         if (valorFormato <= 0 || dataFormato == null)
             return;
 
-        EmpregadoController.getEmpregado(id).addTaxaServico(new TaxaServico(dataFormato, valorFormato));
+        EmpregadoController.getEmpregado(id).addTaxaServico(new TaxaServico(data, valorFormato));
     }
 
     public String getEmpregadoPorNome(String nome, int indice) throws Exception {
+
+        EmpregadoXML xml = new EmpregadoXML();
+
+        EmpregadoController.empregados = xml.readEmpregados();
 
         int count = 0;
 
@@ -466,12 +479,19 @@ public class Facade {
         if (e == null)
             return;
 
+        File file = new File( emp + ".xml" );
+
+        if (file.exists()) {
+            System.out.println("test");
+            file.delete();
+        }
+
         EmpregadoController.empregados.remove(emp);
     }
 
     public String totalFolha(String data) throws Exception {
 
-        FolhaDePagamento folha = new FolhaDePagamento(   EmpregadoController.getEmpregadoHoristas(),
+        SistemaFolha folha = new SistemaFolha(   EmpregadoController.getEmpregadoHoristas(),
                                         EmpregadoController.getEmpregadoComissionado(),
                                         EmpregadoController.getEmpregadoAssalariado());
 

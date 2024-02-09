@@ -5,6 +5,10 @@ public class Banco extends MetodoPagamento {
     private String agencia;
     private String contaCorrente;
 
+    public Banco () {
+
+    }
+
     public Banco(String banco, String agencia, String contaCorrente) {
         this.banco = banco;
         this.agencia = agencia;
@@ -21,6 +25,18 @@ public class Banco extends MetodoPagamento {
 
     public String getContaCorrente() {
         return contaCorrente;
+    }
+
+    public void setAgencia(String agencia) {
+        this.agencia = agencia;
+    }
+
+    public void setBanco(String banco) {
+        this.banco = banco;
+    }
+
+    public void setContaCorrente(String contaCorrente) {
+        this.contaCorrente = contaCorrente;
     }
 
     @Override
