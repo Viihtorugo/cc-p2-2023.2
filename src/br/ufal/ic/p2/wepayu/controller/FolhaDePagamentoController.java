@@ -4,26 +4,18 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 public class FolhaDePagamentoController {
-    private static int countFriday = 1;
+    private static int countDay = 1;
 
-    public static void incrementCountFriday(LocalDate data) {
-
-        if (data.getDayOfWeek() == DayOfWeek.FRIDAY) {
-            countFriday++;
-        }
+    public static void incrementCountDay() {
+            countDay++;
     }
 
-    public static void restartCountFriday(LocalDate data) {
-        System.out.println(countFriday);
-        if (countFriday % 5 == 0 && data.getDayOfWeek() == DayOfWeek.FRIDAY) {
-            countFriday = 1;
-        }
-    }
 
-    public static boolean pagamentoComissionado() {
-        if (countFriday % 3 == 0) {
-            return true;
-        }
+    public static boolean ehDiaDoPagamentoComissionado() {
+
+        System.out.println(countDay);
+
+        if (countDay % 15 == 0) return true;
 
         return false;
     }

@@ -58,4 +58,6 @@ public abstract class Empregado {
     public abstract void setSalario(double salario);
 
     public abstract String getTipo();
+
+
 }

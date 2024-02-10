@@ -5,6 +5,7 @@ import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.*;
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.utils.Utils;
+import jdk.jshell.execution.Util;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -489,13 +490,9 @@ public class Facade {
 
     public String totalFolha(String data) throws Exception {
 
-        SistemaFolha folha = new SistemaFolha(   EmpregadoController.getEmpregadoHoristas(),
-                                        EmpregadoController.getEmpregadoComissionado(),
-                                        EmpregadoController.getEmpregadoAssalariado());
-
         LocalDate dataFormato = Utils.validData(data, "");
 
-        folha.construirFolha(dataFormato);
+        FolhaDePagamento folha = new FolhaDePagamento(dataFormato);
 
         double total = folha.totalFolha();
 
@@ -504,15 +501,11 @@ public class Facade {
 
     public void rodaFolha(String data, String saida) throws Exception {
 
-        SistemaFolha folha = new SistemaFolha(   EmpregadoController.getEmpregadoHoristas(),
-                EmpregadoController.getEmpregadoComissionado(),
-                EmpregadoController.getEmpregadoAssalariado());
-
-
         LocalDate dataFormato = Utils.validData(data, "");
-        folha.construirFolha(dataFormato);
 
-        folha.fileFolha(dataFormato, saida);
+        FolhaDePagamento folha = new FolhaDePagamento(dataFormato, saida);
+
+        folha.geraFolha();
     }
 
 }

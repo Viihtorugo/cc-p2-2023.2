@@ -1,13 +1,11 @@
 package br.ufal.ic.p2.wepayu.utils;
 
-import br.ufal.ic.p2.wepayu.models.EmpregadoHorista;
-
 import java.io.FileWriter;
 
-public class FolhaDePagamento {
+public class FolhaDePagamentoUtils {
     public static void writeEmpregadoHeader(FileWriter writter, String type) {
         try {
-
+            System.out.println("EScrevendo emprehado header");
             writter.write("=".repeat(127) + "\n");
             writter.write(Utils.padRight(String.format("===================== %s ", type), 127, "=") + "\n");
             writter.write("=".repeat(127) + "\n");
@@ -65,6 +63,24 @@ public class FolhaDePagamento {
             System.out.println("Erro durante a escrita do funcionário");
         }
 
+    }
+
+    public static void writeComissionado(FileWriter writter, String nome, double fixo, double vendas, double comissao, double bruto, double descontos, double liquido, String metodo) {
+        String line = Utils.padRight(nome, 21);
+
+        line += Utils.padLeft(Utils.convertDoubleToString(fixo, 2), 9);
+        line += Utils.padLeft(Utils.convertDoubleToString(vendas, 2), 9);
+        line += Utils.padLeft(Utils.convertDoubleToString(comissao, 2), 9);
+        line += Utils.padLeft(Utils.convertDoubleToString(bruto, 2), 14);
+        line += Utils.padLeft(Utils.convertDoubleToString(descontos, 2), 10);
+        line += Utils.padLeft(Utils.convertDoubleToString(liquido, 2), 16);
+        line += " " + metodo + "\n";
+
+        try {
+            writter.write(line);
+        } catch (Exception e) {
+            System.out.println("Erro durante a escrita do funcionário");
+        }
     }
 
 

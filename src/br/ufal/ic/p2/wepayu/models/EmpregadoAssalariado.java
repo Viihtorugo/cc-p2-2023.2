@@ -17,6 +17,8 @@ public class EmpregadoAssalariado extends Empregado {
         return salarioMensal;
     }
 
+    public double getSalarioBruto() { return salarioMensal; }
+
     @Override
     public MembroSindicalizado getSindicalizado() {
         return super.getSindicalizado();

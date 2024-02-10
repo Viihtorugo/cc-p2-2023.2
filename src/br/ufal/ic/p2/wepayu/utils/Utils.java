@@ -517,11 +517,6 @@ public class Utils {
         return String.format(("%." + decimalPlaces + "f"), value).replace(".", ",");
     }
 
-    public static String convertDoubleToStringByFolha(double value) {
-        System.out.println("test");
-        return null;
-    }
-
     public static double convertDoubleToStringFormattPagamento (String value) {
 
         int posicaoSeparador = value.indexOf(".");
@@ -574,8 +569,6 @@ public class Utils {
         }
 
         int padLength = length - value.length();
-
-        System.out.println(padLength);
 
         return value + padChar.repeat(padLength);
     }

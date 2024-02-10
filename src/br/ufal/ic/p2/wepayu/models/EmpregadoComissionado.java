@@ -103,6 +103,13 @@ public class EmpregadoComissionado extends Empregado {
         return this.vendas;
     }
 
+    public double getSalarioBruto(LocalDate dataInicial, LocalDate dataCriacao) throws Exception {
+        double comissao = this.getVendasRealizadas(dataInicial, dataCriacao) * this.taxaDeComissao;
+        double salarioFixo = (24.0 * this.salarioMensal)/52.0;
+        salarioFixo =((int)(salarioFixo*100))/100f;
+        return comissao + salarioFixo;
+    }
+
     @Override
     public void setEndereco(String endereco) {
         super.setEndereco(endereco);

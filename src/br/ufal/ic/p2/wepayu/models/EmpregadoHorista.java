@@ -21,6 +21,8 @@ public class EmpregadoHorista extends Empregado {
         this.cartao = new ArrayList<CartaoDePonto>();
     }
 
+
+
     public void addRegistro(String data, double horas) {
 
 
@@ -111,6 +113,13 @@ public class EmpregadoHorista extends Empregado {
     @Override
     public String getTipo() {
         return "horista";
+    }
+
+    public double getSalarioBruto(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
+        double valorHorasNormais = this.getHorasNormaisTrabalhadas(dataInicial, dataFinal) * this.salarioPorHora;
+        double valorHorasExtras = 1.5 * this.getHorasExtrasTrabalhadas(dataInicial, dataFinal) * this.salarioPorHora;
+
+        return valorHorasNormais + valorHorasExtras;
     }
 
     @Override
