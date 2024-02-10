@@ -5,7 +5,7 @@ import java.io.FileWriter;
 public class FolhaDePagamentoUtils {
     public static void writeEmpregadoHeader(FileWriter writter, String type) {
         try {
-            
+
             writter.write("=".repeat(127) + "\n");
             writter.write(Utils.padRight(String.format("===================== %s ", type), 127, "=") + "\n");
             writter.write("=".repeat(127) + "\n");

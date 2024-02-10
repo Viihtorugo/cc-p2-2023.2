@@ -8,6 +8,11 @@ public class Correios extends MetodoPagamento {
 
     @Override
     public String getMetodoPagamento() {
+        return "correios";
+    }
+
+    @Override
+    public String getOutputFile() {
         return "Correios";
     }
 }

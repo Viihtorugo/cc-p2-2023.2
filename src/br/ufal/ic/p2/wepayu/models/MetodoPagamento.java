@@ -7,4 +7,6 @@ public abstract class MetodoPagamento {
     }
 
     public abstract String getMetodoPagamento();
+
+    public abstract String getOutputFile();
 }

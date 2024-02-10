@@ -119,7 +119,7 @@ public class FolhaDePagamento {
                 totalSalarioLiquido += salarioLiquido;
                 totalDescontos += descontos;
 
-                String metodo = e.getMetodoPagamento().getMetodoPagamento() + ", " + e.getEndereco() ;
+                String metodo = e.getMetodoPagamento().getOutputFile() + ", " + e.getEndereco() ;
 
                 FolhaDePagamentoUtils.writeAssalariado(escritor, nome, salarioBruto, descontos, salarioLiquido, metodo);
             }
@@ -205,7 +205,7 @@ public class FolhaDePagamento {
             totalSalarioLiquido += salarioLiquido;
 
             EmpregadoController.setValue(entry.getKey(),e);
-            FolhaDePagamentoUtils.writeHorista(escritor, nome, horaNormais, horaExtras, salarioBruto, descontos, salarioLiquido, e.getMetodoPagamento().getMetodoPagamento());
+            FolhaDePagamentoUtils.writeHorista(escritor, nome, horaNormais, horaExtras, salarioBruto, descontos, salarioLiquido, e.getMetodoPagamento().getOutputFile());
         }
 
         escritor.write("\n");
@@ -313,7 +313,7 @@ public class FolhaDePagamento {
             totalDescontos += descontos;
 
 
-            String metodo = e.getMetodoPagamento().getMetodoPagamento() + ", " + e.getEndereco();
+            String metodo = e.getMetodoPagamento().getOutputFile() + ", " + e.getEndereco();
 
             FolhaDePagamentoUtils.writeComissionado(escritor, nome, salarioFixo, vendas, comissao, salarioBruto, descontos, salarioLiquido, metodo);
 
