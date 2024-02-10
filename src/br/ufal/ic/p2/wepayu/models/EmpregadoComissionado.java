@@ -105,8 +105,13 @@ public class EmpregadoComissionado extends Empregado {
 
     public double getSalarioBruto(LocalDate dataInicial, LocalDate dataCriacao) throws Exception {
         double comissao = this.getVendasRealizadas(dataInicial, dataCriacao) * this.taxaDeComissao;
-        double salarioFixo = (24.0 * this.salarioMensal)/52.0;
-        salarioFixo =((int)(salarioFixo*100))/100f;
+        comissao = Math.floor(comissao*100)/100F;
+
+        double salarioFixo = getSalario();
+        salarioFixo = Math.floor((salarioFixo*12D/52D)*2D * 100)/100F;
+
+
+
         return comissao + salarioFixo;
     }
 

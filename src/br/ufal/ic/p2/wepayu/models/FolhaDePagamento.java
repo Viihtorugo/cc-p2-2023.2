@@ -47,9 +47,13 @@ public class FolhaDePagamento {
             total += calculaHoristas(escritor);
             escritor.write("\n");
 
+            try {
+                total += calculaAssalariados(escritor);
+                escritor.write("\n");
+            } catch (Exception error) {
+                System.out.println(error.getMessage());
+            }
 
-            total += calculaAssalariados(escritor);
-            escritor.write("\n");
 
 
             total += calculaComissionados(escritor);
@@ -77,7 +81,7 @@ public class FolhaDePagamento {
 
             FolhaDePagamentoUtils.writeEmpregadoHeader(escritor, "ASSALARIADOS");
 
-            HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(EmpregadoController.getEmpregadoHoristas());
+            HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(EmpregadoController.getEmpregadoAssalariado());
             LocalDate dataInicial = dataCriacao.minusDays(dataCriacao.lengthOfMonth() - 1);
 
             if(dataCriacao.getDayOfMonth() != dataCriacao.lengthOfMonth()) {
@@ -110,6 +114,10 @@ public class FolhaDePagamento {
                 double salarioLiquido = salarioBruto - descontos;
 
                 if (salarioLiquido <= 0) salarioLiquido = 0;
+
+                totalSalarioBruto += salarioBruto;
+                totalSalarioLiquido += salarioLiquido;
+                totalDescontos += descontos;
 
                 String metodo = e.getMetodoPagamento().getMetodoPagamento() + ", " + e.getEndereco() ;
 
@@ -178,17 +186,17 @@ public class FolhaDePagamento {
             if (ms != null) {
                 descontos += 7 * ms.getTaxaSindical();
                 descontos += ms.getTaxaServicos(dataInicial, dataCriacao);
+                descontos += e.getDescontos();
             }
-
 
 
             double salarioLiquido = salarioBruto - descontos;
 
             if (salarioLiquido < 0) {
+                e.setDescontos(descontos);
                 salarioLiquido = 0;
                 descontos = 0;
             }
-
 
             totalHorasNormais += horaNormais;
             totalHorasExtras += horaExtras;
@@ -196,7 +204,7 @@ public class FolhaDePagamento {
             totalDescontos += descontos;
             totalSalarioLiquido += salarioLiquido;
 
-
+            EmpregadoController.setValue(entry.getKey(),e);
             FolhaDePagamentoUtils.writeHorista(escritor, nome, horaNormais, horaExtras, salarioBruto, descontos, salarioLiquido, e.getMetodoPagamento().getMetodoPagamento());
         }
 
@@ -272,7 +280,9 @@ public class FolhaDePagamento {
 
             double salarioLiquido = 0;
 
-            salarioFixo = (24.0 * e.getSalario())/52.0;
+            salarioFixo = e.getSalario();
+            salarioFixo = Math.floor((salarioFixo*12D/52D)*2D * 100)/100F;
+
             salarioFixo = ((int)(salarioFixo * 100))/100.0f;
             vendas = e.getVendasRealizadas(dataInicial, dataCriacao);
             comissao = e.getTaxaDeComissao();
@@ -281,9 +291,7 @@ public class FolhaDePagamento {
 
             comissao = Math.floor(comissao*100)/100F;
 
-            salarioBruto = e.getSalarioBruto(dataInicial, dataCriacao);
-
-            salarioBruto = ((int)(salarioBruto*100))/100f;
+            salarioBruto = salarioFixo + comissao;
 
             MembroSindicalizado m = e.getSindicalizado();
 
@@ -293,8 +301,9 @@ public class FolhaDePagamento {
                 descontos = m.getTaxaServicos(dataInicial, dataCriacao) + diasDiff * m.getTaxaSindical();
             }
 
-            if (salarioBruto >= descontos)
+            if (salarioBruto >= descontos) {
                 salarioLiquido = salarioBruto - descontos;
+            }
 
             totalSalarioLiquido += salarioLiquido;
             totalComissao += comissao;
@@ -312,7 +321,6 @@ public class FolhaDePagamento {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        System.out.println("saiu do for");
 
         escritor.write("\n");
         String footer = Utils.padRight("TOTAL COMISSIONADOS", 21);
@@ -353,14 +361,20 @@ public class FolhaDePagamento {
 
 
             // Comissionado, sexta-feira e multiplo d
-            } else if (e instanceof  EmpregadoComissionado &&
-                    dataCriacao.getDayOfWeek() == DayOfWeek.FRIDAY  &&
-                    FolhaDePagamentoController.ehDiaDoPagamentoComissionado()) {
+            } else if (e instanceof  EmpregadoComissionado )
+                     {
+
+                boolean multiplo =  (ChronoUnit.DAYS.between(LocalDate.of(2005, 1, 1), dataCriacao) + 1) % 14 == 0;
+
+                boolean deveCalcular = dataCriacao.getDayOfWeek() == DayOfWeek.FRIDAY && multiplo;
+
+                if (!deveCalcular) continue;
 
                 LocalDate dataInicial = dataCriacao.minusDays(13);
 
                 double salarioBruto = ((EmpregadoComissionado) e).getSalarioBruto(dataInicial, dataCriacao);
-                salarioBruto = ((int)(salarioBruto*100))/100f;
+
+
                 total += salarioBruto ;
             } else if (e instanceof EmpregadoAssalariado &&
                     dataCriacao.getDayOfMonth() == dataCriacao.lengthOfMonth()) {

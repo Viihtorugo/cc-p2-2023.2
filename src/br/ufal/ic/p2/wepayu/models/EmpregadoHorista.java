@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class EmpregadoHorista extends Empregado {
 
+    private double descontos;
     private double salarioPorHora;
     private ArrayList<CartaoDePonto> cartao;
 
@@ -19,9 +20,16 @@ public class EmpregadoHorista extends Empregado {
         super(nome, endereco);
         this.salarioPorHora = salarioPorHora;
         this.cartao = new ArrayList<CartaoDePonto>();
+        this.descontos = 0;
     }
 
+    public double getDescontos() {
+        return descontos;
+    }
 
+    public void setDescontos(double descontos) {
+        this.descontos = descontos;
+    }
 
     public void addRegistro(String data, double horas) {
 
