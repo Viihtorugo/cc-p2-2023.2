@@ -1,11 +1,12 @@
 package br.ufal.ic.p2.wepayu;
 
+import br.ufal.ic.p2.wepayu.controller.FacadeController;
 import br.ufal.ic.p2.wepayu.database.EmpregadoXML;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.*;
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.utils.Utils;
-import jdk.jshell.execution.Util;
+
 
 import java.io.File;
 import java.time.LocalDate;
@@ -13,48 +14,22 @@ import java.util.Map;
 
 public class Facade {
 
+    private FacadeController facedeController;
+
     public Facade() {
-        EmpregadoXML xml = new EmpregadoXML();
-        EmpregadoController.empregados = xml.readEmpregados();
+        this.facedeController = new FacadeController();
     }
 
     public void zerarSistema() {
-        Utils.initSystem();
-        Utils.deleteFilesXML();
-        Utils.deleteFolhas();
-        System.out.println("-> Sistema zerado");
-
+        this.facedeController.cleanSystem();
     }
 
     public void encerrarSistema() {
-        System.out.println("-> Sistema encerrado");
-
-        EmpregadoXML xml = new EmpregadoXML();
-
-        xml.save(EmpregadoController.empregados);
+        this.facedeController.shutDownSystem();
     }
 
-    //4 variaveis
     public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws Exception {
-
-        if (!Utils.validCriarEmpregado(nome, endereco, tipo, salario))
-            return null;
-
-        if (!Utils.validTipoNotComissionado(tipo))
-            return null;
-
-        double salarioFormato = Utils.validSalario(salario);
-
-        if (salarioFormato <= 0)
-            return null;
-
-        if (tipo.equals("assalariado")) {
-            return EmpregadoController.setEmpregado(new EmpregadoAssalariado(nome, endereco, salarioFormato));
-        } else if (tipo.equals("horista")) {
-            return EmpregadoController.setEmpregado(new EmpregadoHorista(nome, endereco, salarioFormato));
-        }
-
-        return null;
+        return this.facedeController.createEmpregado(nome, endereco, tipo, salario);
     }
 
     //5 variaveis
