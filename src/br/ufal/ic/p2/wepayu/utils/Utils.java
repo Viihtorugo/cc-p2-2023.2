@@ -29,12 +29,6 @@ public class Utils {
         return sortedMap;
     }
 
-
-    
-    public static void initSystem () {
-        EmpregadoController.empregados = new HashMap<>();
-        EmpregadoController.key = 0;
-    }
     public static void deleteFilesXML () {
 
         for (int i = 1; i <= 1000; i++) {
@@ -80,11 +74,13 @@ public class Utils {
 
         return true;
     }
-    public static boolean sindicalizarEmpregado(String idSindicato) throws Exception {
+    public static boolean sindicalizarEmpregado(String idSindicato, EmpregadoController empregadoController) throws Exception {
 
         boolean flag = true;
 
-        for (Map.Entry<String, Empregado> entry : EmpregadoController.empregados.entrySet()) {
+        HashMap<String, Empregado> empregados = empregadoController.getEmpregados();
+
+        for (Map.Entry<String, Empregado> entry : empregados.entrySet()) {
             MembroSindicalizado m = entry.getValue().getSindicalizado();
 
             if (m != null)
@@ -154,7 +150,7 @@ public class Utils {
         return valorFormato;
     }
 
-    public static String validMembroSindicalizadoPeloID(String membro) throws Exception {
+    public static String validMembroSindicalizadoPeloID(String membro, EmpregadoController empregadoController) throws Exception {
 
         ExceptionEmpregado e = new ExceptionEmpregado();
 
@@ -163,7 +159,7 @@ public class Utils {
             return null;
         }
 
-        String id = EmpregadoController.getEmpregadoPorIdSindical(membro);
+        String id = empregadoController.getEmpregadoPorIdSindical(membro);
 
         if (id == null) {
             e.msgMembroNaoExiste();
@@ -183,13 +179,13 @@ public class Utils {
         return m;
     }
 
-    public static Empregado validEmpregado(String emp) throws Exception {
+    public static Empregado validEmpregado(String emp, EmpregadoController empregadoController) throws Exception {
         ExceptionEmpregado ex = new ExceptionEmpregado();
 
         if (emp.isEmpty())
             ex.msgNullIndex();
 
-        Empregado e = EmpregadoController.getEmpregado(emp);
+        Empregado e = empregadoController.getEmpregado(emp);
 
         if (e != null)
             return e;

@@ -4,19 +4,19 @@ import java.lang.String;
 
 public class CartaoDeVenda {
     private String data;
-    private Double horas;
+    private Double valor;
 
     public CartaoDeVenda () {
 
     }
 
-    public CartaoDeVenda (String data, Double horas) {
+    public CartaoDeVenda (String data, Double valor) {
         this.data = data;
-        this.horas = horas;
+        this.valor = valor;
     }
 
-    public Double getHoras() {
-        return horas;
+    public Double getValor() {
+        return this.valor;
     }
 
     public String getData() {
@@ -27,7 +27,7 @@ public class CartaoDeVenda {
         this.data = data;
     }
 
-    public void setHoras(Double horas) {
-        this.horas = horas;
+    public void setValor(Double valor) {
+        this.valor = valor;
     }
 }

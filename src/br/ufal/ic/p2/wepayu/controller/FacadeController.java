@@ -7,16 +7,22 @@ import br.ufal.ic.p2.wepayu.utils.Utils;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 public class FacadeController {
 
+    private EmpregadoController empregadoController;
+
     public FacadeController () {
+        this.empregadoController = new EmpregadoController();
         EmpregadoXML xml = new EmpregadoXML();
-        EmpregadoController.empregados = xml.readEmpregados();
+        this.empregadoController.setEmpregados(xml.readEmpregados());
     }
-    public void zerarSistema() {
-        Utils.initSystem();
+    public void zerarSistema() throws Exception {
+        SystemController.pushUndo(this.empregadoController);
+
+        this.empregadoController = new EmpregadoController();
         Utils.deleteFilesXML();
         Utils.deleteFolhas();
         System.out.println("-> Sistema zerado");
@@ -26,11 +32,14 @@ public class FacadeController {
         System.out.println("-> Sistema encerrado");
 
         EmpregadoXML xml = new EmpregadoXML();
-        xml.save(EmpregadoController.empregados);
+        xml.save(this.empregadoController.getEmpregados());
+        SystemController.systemOff();
     }
 
     //4 variaveis
     public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws Exception {
+        SystemController.pushUndo(this.empregadoController);
+
         if (!Utils.validCriarEmpregado(nome, endereco, tipo, salario))
             return null;
 
@@ -43,36 +52,44 @@ public class FacadeController {
             return null;
 
         if (tipo.equals("assalariado")) {
-            return EmpregadoController.setEmpregado(new EmpregadoAssalariado(nome, endereco, salarioFormato));
+            return this.empregadoController.setEmpregado(new EmpregadoAssalariado(nome, endereco, salarioFormato));
         } else if (tipo.equals("horista")) {
-            return EmpregadoController.setEmpregado(new EmpregadoHorista(nome, endereco, salarioFormato));
+            return this.empregadoController.setEmpregado(new EmpregadoHorista(nome, endereco, salarioFormato));
         }
 
         return null;
     }
 
     public String criarEmpregado (String nome, String endereco, String tipo, String salario, String comissao) throws Exception {
-        if (!Utils.validCriarEmpregado(nome, endereco, tipo, salario, comissao))
-            return null;
+        SystemController.pushUndo(this.empregadoController);
 
-        if (!Utils.validTipoComissionado(tipo))
+        if (!Utils.validCriarEmpregado(nome, endereco, tipo, salario, comissao)) {
             return null;
+        }
+
+        if (!Utils.validTipoComissionado(tipo)) {
+            return null;
+        }
 
         double salarioFormato = Utils.validSalario(salario);
 
-        if (salarioFormato <= 0)
+        if (salarioFormato <= 0) {
             return null;
+        }
 
         double comissaoFormato = Utils.validComissao(comissao);
 
-        if (comissaoFormato <= 0)
+        if (comissaoFormato <= 0) {
             return null;
+        }
 
-        return EmpregadoController.setEmpregado(new EmpregadoComissionado(nome, endereco, salarioFormato, comissaoFormato));
+        return this.empregadoController.setEmpregado(new EmpregadoComissionado(nome, endereco, salarioFormato, comissaoFormato));
     }
 
     public void lancaCartao(String emp, String data, String horas) throws Exception {
-        Empregado e = Utils.validEmpregado(emp);
+        SystemController.pushUndo(this.empregadoController);
+
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
         if (e == null)
             return;
@@ -89,25 +106,30 @@ public class FacadeController {
     }
 
     public void lancaVenda(String emp, String data, String valor) throws Exception {
-        Empregado e = Utils.validEmpregado(emp);
 
-        if (e == null)
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
+
+        if (e == null) {
             return;
+        }
 
         if (Utils.validTipoEmpregado(e, "comissionado")) {
             double valorFormato = Utils.validValor(valor);
             LocalDate dataFormato = Utils.validData(data, " ");
 
-            if (valorFormato <= 0 || dataFormato == null)
+            if (valorFormato <= 0 || dataFormato == null) {
                 return;
+            }
 
+            SystemController.pushUndo(this.empregadoController);
             ((EmpregadoComissionado) e).addVenda(data, valorFormato);
         }
     }
 
     public void lancaTaxaServico(String membro, String data, String valor) throws Exception {
+        SystemController.pushUndo(this.empregadoController);
 
-        String id = Utils.validMembroSindicalizadoPeloID(membro);
+        String id = Utils.validMembroSindicalizadoPeloID(membro, this.empregadoController);
 
         if (id == null)
             return;
@@ -118,14 +140,16 @@ public class FacadeController {
         if (valorFormato <= 0 || dataFormato == null)
             return;
 
-        EmpregadoController.getEmpregado(id).addTaxaServico(new TaxaServico(data, valorFormato));
+        this.empregadoController.getEmpregado(id).addTaxaServico(new TaxaServico(data, valorFormato));
     }
 
     public String getEmpregadoPorNome(String nome, int indice) throws Exception {
 
         int count = 0;
 
-        for (Map.Entry<String, Empregado> entry : EmpregadoController.empregados.entrySet()) {
+        HashMap<String, Empregado> empregados = this.empregadoController.getEmpregados();
+
+        for (Map.Entry<String, Empregado> entry : empregados.entrySet()) {
 
             Empregado e = entry.getValue();
 
@@ -144,8 +168,7 @@ public class FacadeController {
     }
 
     public String getAtributoEmpregado(String emp, String atributo) throws Exception {
-
-        Empregado e = Utils.validEmpregado(emp);
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
         if (e == null)
             return null;
@@ -213,7 +236,7 @@ public class FacadeController {
     }
 
     public String getHorasNormaisTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception {
-        Empregado e = Utils.validEmpregado(emp);
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
         if (e == null) return "0";
 
@@ -238,7 +261,7 @@ public class FacadeController {
     }
 
     public String getHorasExtrasTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception {
-        Empregado e = Utils.validEmpregado(emp);
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
         if (e == null) return null;
 
@@ -263,7 +286,7 @@ public class FacadeController {
     }
 
     public String getVendasRealizadas(String emp, String dataInicial, String dataFinal) throws Exception {
-        Empregado e = Utils.validEmpregado(emp);
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
         if (e == null) return null;
 
@@ -289,7 +312,7 @@ public class FacadeController {
 
     public String getTaxasServico(String emp, String dataInicial, String dataFinal) throws Exception {
 
-        Empregado e = Utils.validEmpregado(emp);
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
         if (e == null)
             return "0,00";
@@ -317,8 +340,9 @@ public class FacadeController {
 
     // 3 variaveis
     public void alteraEmpregado(String emp, String atributo, String valor) throws Exception {
+        SystemController.pushUndo(this.empregadoController);
 
-        Empregado e = Utils.validEmpregado(emp);
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
         if (e == null)
             return;
@@ -372,11 +396,11 @@ public class FacadeController {
                 double salario = e.getSalario();
 
                 switch (valor) {
-                    case "horista" -> EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, salario));
+                    case "horista" -> this.empregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, salario));
                     case "assalariado" ->
-                            EmpregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, salario));
+                            this.empregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, salario));
                     case "comissionado" ->
-                            EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, 0));
+                            this.empregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, 0));
                 }
             }
 
@@ -395,10 +419,14 @@ public class FacadeController {
 
     // 4 variaveis
     public void alteraEmpregado(String emp, String atributo, String valor, String sal) throws Exception {
-        Empregado e = Utils.validEmpregado(emp);
+        SystemController.pushUndo(this.empregadoController);
 
-        if (e == null)
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
+
+        if (e == null) {
             return;
+        }
+
 
         if (!Utils.validGetAtributo(emp, atributo))
             return;
@@ -413,7 +441,7 @@ public class FacadeController {
             if (comissao < 0)
                 return;
 
-            EmpregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, comissao));
+            this.empregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, comissao));
 
         } else if (valor.equals("horista")) {
             double novoSalario = Utils.validSalario(sal);
@@ -421,12 +449,13 @@ public class FacadeController {
             if (novoSalario < 0)
                 return;
 
-            EmpregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, novoSalario));
+            this.empregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, novoSalario));
         }
     }
 
     // 5 variaveis
     public void alteraEmpregado(String emp, String atributo, String valor, String idSindicato, String taxaSindical) throws Exception {
+        SystemController.pushUndo(this.empregadoController);
 
         if (Utils.validIdSindical(idSindicato))
             return;
@@ -438,8 +467,8 @@ public class FacadeController {
 
         if (atributo.equals("sindicalizado") && valor.equals("true")) {
 
-            if (Utils.sindicalizarEmpregado(idSindicato)) {
-                Empregado e = Utils.validEmpregado(emp);
+            if (Utils.sindicalizarEmpregado(idSindicato, this.empregadoController)) {
+                Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
                 if (e == null) return;
 
@@ -450,7 +479,9 @@ public class FacadeController {
 
     // 6 variaveis
     public void alteraEmpregado(String emp, String atributo, String tipo, String banco, String agencia, String contaCorrente) throws Exception {
-        Empregado e = Utils.validEmpregado(emp);
+        SystemController.pushUndo(this.empregadoController);
+
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
         if (e == null)
             return;
@@ -463,7 +494,9 @@ public class FacadeController {
     }
 
     public void removerEmpregado(String emp) throws Exception {
-        Empregado e = Utils.validEmpregado(emp);
+        SystemController.pushUndo(this.empregadoController);
+
+        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
         if (e == null)
             return;
@@ -475,7 +508,7 @@ public class FacadeController {
             file.delete();
         }
 
-        EmpregadoController.empregados.remove(emp);
+        this.empregadoController.removeEmpregado(emp);
     }
 
     public String totalFolha(String data) throws Exception {
@@ -484,17 +517,33 @@ public class FacadeController {
 
         FolhaDePagamento folha = new FolhaDePagamento(dataFormato);
 
-        double total = folha.totalFolha();
+        double total = folha.totalFolha(this.empregadoController);
 
         return Utils.convertDoubleToString(total, 2);
     }
 
     public void rodaFolha(String data, String saida) throws Exception {
+        SystemController.pushUndo(this.empregadoController);
 
         LocalDate dataFormato = Utils.validData(data, "");
 
         FolhaDePagamento folha = new FolhaDePagamento(dataFormato, saida);
 
-        folha.geraFolha();
+        folha.geraFolha(this.empregadoController);
+    }
+
+    public String getNumeroDeEmpregados() {
+
+        int n = this.empregadoController.getNumeroDeEmpregados();
+
+        return Integer.toString(n);
+    }
+
+    public void undo() throws Exception {
+        this.empregadoController.setEmpregados(SystemController.popUndo());
+    }
+
+    public void redo() throws Exception {
+        this.empregadoController.setEmpregados(SystemController.popRedo());
     }
 }

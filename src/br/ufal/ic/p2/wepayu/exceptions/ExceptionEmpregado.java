@@ -97,5 +97,4 @@ public class ExceptionEmpregado extends Exception {
     public void msgTaxaSindicalNula () throws Exception{
         throw new Exception("Taxa sindical nao pode ser nula.");
     }
-
 }

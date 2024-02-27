@@ -1,6 +1,6 @@
 package br.ufal.ic.p2.wepayu.models;
 
-public abstract class Empregado {
+public abstract class Empregado{
     private String nome;
     private String endereco;
     private MembroSindicalizado sindicalizado;

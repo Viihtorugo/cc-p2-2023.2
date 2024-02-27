@@ -10,7 +10,7 @@ public class Facade {
         this.facedeController = new FacadeController();
     }
 
-    public void zerarSistema() {
+    public void zerarSistema() throws Exception {
         this.facedeController.zerarSistema();
     }
 
@@ -94,4 +94,15 @@ public class Facade {
         this.facedeController.rodaFolha(data, saida);
     }
 
+    public String getNumeroDeEmpregados() {
+        return this.facedeController.getNumeroDeEmpregados();
+    }
+
+    public void undo() throws Exception {
+        this.facedeController.undo();
+    }
+
+    public void redo() throws Exception {
+        this.facedeController.redo();
+    }
 }

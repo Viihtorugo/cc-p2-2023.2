@@ -31,7 +31,7 @@ public class FolhaDePagamento {
         this.arquivoSaida = arquivoSaida;
     }
 
-    public void geraFolha() throws Exception {
+    public void geraFolha(EmpregadoController empregadoController) throws Exception {
         if (this.arquivoSaida.isEmpty()) throw new Exception("Arquivo de saída não especificado");
 
         double total = 0;
@@ -44,11 +44,11 @@ public class FolhaDePagamento {
             escritor.write("\n");
 
             // Dados dos empregados
-            total += calculaHoristas(escritor);
+            total += calculaHoristas(escritor, empregadoController);
             escritor.write("\n");
 
             try {
-                total += calculaAssalariados(escritor);
+                total += calculaAssalariados(escritor, empregadoController);
                 escritor.write("\n");
             } catch (Exception error) {
                 System.out.println(error.getMessage());
@@ -56,7 +56,7 @@ public class FolhaDePagamento {
 
 
 
-            total += calculaComissionados(escritor);
+            total += calculaComissionados(escritor, empregadoController);
             escritor.write("\n");
 
 
@@ -71,7 +71,7 @@ public class FolhaDePagamento {
 
     }
 
-    public double calculaAssalariados(FileWriter escritor) throws Exception {
+    public double calculaAssalariados(FileWriter escritor, EmpregadoController empregadoController) throws Exception {
         if (this.arquivoSaida.isEmpty()) throw new Exception("Arquivo de saída não especificado");
 
         double totalSalarioBruto = 0;
@@ -81,7 +81,7 @@ public class FolhaDePagamento {
 
             FolhaDePagamentoUtils.writeEmpregadoHeader(escritor, "ASSALARIADOS");
 
-            HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(EmpregadoController.getEmpregadoAssalariado());
+        HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(empregadoController.getEmpregadoAssalariado());
             LocalDate dataInicial = dataCriacao.minusDays(dataCriacao.lengthOfMonth() - 1);
 
             if(dataCriacao.getDayOfMonth() != dataCriacao.lengthOfMonth()) {
@@ -96,7 +96,7 @@ public class FolhaDePagamento {
             }
 
             for (Map.Entry<String, String> entry: empregados.entrySet()){
-                EmpregadoAssalariado e = (EmpregadoAssalariado) EmpregadoController.getEmpregado(entry.getKey());
+                EmpregadoAssalariado e = (EmpregadoAssalariado) empregadoController.getEmpregado(entry.getKey());
 
                 String nome = e.getNome();
                 double salarioBruto = e.getSalario();
@@ -142,7 +142,7 @@ public class FolhaDePagamento {
 
     }
 
-    public double calculaHoristas(FileWriter escritor) throws Exception {
+    public double calculaHoristas(FileWriter escritor, EmpregadoController empregadoController) throws Exception {
         double totalHorasNormais = 0;
         double totalHorasExtras = 0;
         double totalSalarioBruto = 0;
@@ -167,11 +167,11 @@ public class FolhaDePagamento {
             return totalSalarioBruto;
         };
 
-        HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(EmpregadoController.getEmpregadoHoristas());
+        HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(empregadoController.getEmpregadoHoristas());
         LocalDate dataInicial = dataCriacao.minusDays(6);
 
         for (Map.Entry<String, String> entry: empregados.entrySet()) {
-            EmpregadoHorista e = (EmpregadoHorista) EmpregadoController.getEmpregado(entry.getKey());
+            EmpregadoHorista e = (EmpregadoHorista) empregadoController.getEmpregado(entry.getKey());
 
 
             String nome = e.getNome();
@@ -204,7 +204,7 @@ public class FolhaDePagamento {
             totalDescontos += descontos;
             totalSalarioLiquido += salarioLiquido;
 
-            EmpregadoController.setValue(entry.getKey(),e);
+            empregadoController.setValue(entry.getKey(),e);
             FolhaDePagamentoUtils.writeHorista(escritor, nome, horaNormais, horaExtras, salarioBruto, descontos, salarioLiquido, e.getMetodoPagamento().getOutputFile());
         }
 
@@ -223,7 +223,7 @@ public class FolhaDePagamento {
 
     }
 
-    public double calculaComissionados(FileWriter escritor) throws Exception {
+    public double calculaComissionados(FileWriter escritor, EmpregadoController empregadoController) throws Exception {
         if (this.arquivoSaida.isEmpty()) throw new Exception("Arquivo de saída não especificado");
 
         double totalSalarioFixo = 0;
@@ -260,7 +260,7 @@ public class FolhaDePagamento {
 
 
 
-        HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(EmpregadoController.getEmpregadoComissionado());
+        HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(empregadoController.getEmpregadoComissionado());
 
         LocalDate dataInicial = dataCriacao.minusDays(13);
 
@@ -268,7 +268,7 @@ public class FolhaDePagamento {
 
 
         for (Map.Entry<String, String> entry: empregados.entrySet()) {
-            EmpregadoComissionado e = (EmpregadoComissionado) EmpregadoController.getEmpregado(entry.getKey());
+            EmpregadoComissionado e = (EmpregadoComissionado) empregadoController.getEmpregado(entry.getKey());
 
             String nome = e.getNome();
 
@@ -340,13 +340,13 @@ public class FolhaDePagamento {
         return totalSalarioBruto;
     }
 
-    public double totalFolha() throws Exception {
+    public double totalFolha(EmpregadoController empregadoController) throws Exception {
 
         FolhaDePagamentoController.incrementCountDay();
 
         double total = 0;
 
-        HashMap<String, Empregado> empregados = EmpregadoController.empregados;
+        HashMap<String, Empregado> empregados = empregadoController.getEmpregados();
 
         for (Map.Entry<String, Empregado> entry : empregados.entrySet()) {
             Empregado e = entry.getValue();

@@ -53,7 +53,6 @@ public class EmpregadoXML {
 
             if (empregado != null) {
                 empregados.put(id, empregado);
-                EmpregadoController.key = i;
             }
 
         }

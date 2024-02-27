@@ -56,7 +56,7 @@ public class EmpregadoComissionado extends Empregado {
             if (dataFormato != null) {
                 if (dataFormato.isEqual(dataInicial) ||
                         (dataFormato.isAfter(dataInicial) && dataFormato.isBefore(dataFinal))) {
-                    vendasRealizadas += c.getHoras();
+                    vendasRealizadas += c.getValor();
                 }
             }
         }
