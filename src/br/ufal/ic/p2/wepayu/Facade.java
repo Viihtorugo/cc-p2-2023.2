@@ -105,4 +105,8 @@ public class Facade {
     public void redo() throws Exception {
         this.facedeController.redo();
     }
+
+    public void criarAgendaDePagamentos(String descricao) throws Exception {
+        this.facedeController.criarAgendaDePagamentos(descricao);
+    }
 }

@@ -17,6 +17,9 @@ public class SystemController {
         systemOn = false;
     }
 
+    public static boolean getSystemOn () {
+        return systemOn;
+    }
 
     public static void pushUndo(EmpregadoController e) throws Exception {
 

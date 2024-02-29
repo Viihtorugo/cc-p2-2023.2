@@ -1,6 +1,5 @@
 package br.ufal.ic.p2.wepayu.database;
 
-import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.models.Empregado;
 import br.ufal.ic.p2.wepayu.models.EmpregadoAssalariado;
 import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;

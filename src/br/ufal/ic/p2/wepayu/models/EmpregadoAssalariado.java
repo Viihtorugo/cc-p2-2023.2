@@ -18,10 +18,17 @@ public class EmpregadoAssalariado extends Empregado {
     }
 
     public double getSalarioBruto() {
-        if (super.getAgendaDePagamento().equals("semanal 2 5")) {
-            return Math.floor((this.salarioMensal*12D/52D)*2D * 100)/100F;
-        } else if (super.getAgendaDePagamento().equals("semanal 5")) {
-            return Math.floor((this.salarioMensal*12D/52D) * 100)/100F;
+
+        String [] pagamento = super.getAgendaDePagamento().split(" ");
+
+        if (pagamento[0].equals("semanal")) {
+            if (pagamento.length == 3) {
+                int week = Integer.parseInt(pagamento[1]);
+
+                return Math.floor((this.salarioMensal * 12D / 52D) * week * 100) / 100F;
+            } else {
+                return Math.floor((this.salarioMensal*12D/52D) * 100)/100F;
+            }
         } else {
             return this.salarioMensal;
         }

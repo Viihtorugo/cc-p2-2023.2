@@ -15,6 +15,87 @@ import java.util.*;
 
 public class Utils {
 
+    public static boolean validCriarAgendaDePagamentos(String descricao) throws Exception {
+
+        String[] d = descricao.split(" ");
+
+        if (d[0].equals("semanal")) {
+            if (d.length == 2) {
+
+                int value = 0;
+                try {
+                    value = Integer.parseInt(d[1]);
+                } catch (NumberFormatException e) {
+                    System.out.println("Valor não é numero inteiro!");
+                    return false;
+                }
+
+                if (value <= 0 || value >= 8) {
+                    ExceptionConversao e = new ExceptionConversao();
+                    e.msgDescricaoDeAgendaInvalida();
+                    return false;
+                }
+
+            } else if (d.length == 3) {
+                int v1 = 0, v2 = 0;
+
+                try {
+                    v1 = Integer.parseInt(d[1]);
+                    v2 = Integer.parseInt(d[2]);
+                } catch (NumberFormatException e) {
+                    System.out.println("Valor(es) não é(são) numero(s) inteiro(s)!");
+                    return false;
+                }
+
+                if (v1 <= 0 || v1 >= 53 || v2 <= 0 || v2 >= 8) {
+                    ExceptionConversao e = new ExceptionConversao();
+                    e.msgDescricaoDeAgendaInvalida();
+                    return false;
+                }
+
+            } else {
+                ExceptionConversao e = new ExceptionConversao();
+                e.msgDescricaoDeAgendaInvalida();
+
+                return false;
+            }
+
+        } else if (d[0].equals("mensal")) {
+            if (d.length == 2) {
+
+                int value = 0;
+
+                try {
+                    value = Integer.parseInt(d[1]);
+                } catch (NumberFormatException e) {
+                    System.out.println("Valor não é numero inteiro!");
+                    return false;
+                }
+
+                if (value <= 0 || value >= 29) {
+                    ExceptionConversao e = new ExceptionConversao();
+                    e.msgDescricaoDeAgendaInvalida();
+                    return false;
+                }
+
+
+            } else {
+                ExceptionConversao e = new ExceptionConversao();
+                e.msgDescricaoDeAgendaInvalida();
+
+                return false;
+            }
+
+        } else {
+            ExceptionConversao e = new ExceptionConversao();
+            e.msgDescricaoDeAgendaInvalida();
+
+            return false;
+        }
+
+        return true;
+    }
+
     public static Map<String, String> sortHashMap(HashMap<String, String> hashMap) {
 
         List<Map.Entry<String, String>> entryList = new ArrayList<>(hashMap.entrySet());
@@ -29,20 +110,20 @@ public class Utils {
         return sortedMap;
     }
 
-    public static void deleteFilesXML () {
+    public static void deleteFilesXML() {
 
-        for (int i = 1; i <= 1000; i++) {
-            File file = new File( i + ".xml" );
+        File[] folhas = new File("./").listFiles();
 
-            if (file.exists()) {
-                file.delete();
-            } else {
-                return;
+        for (File f : folhas) {
+            if (f.getName().endsWith(".xml")) {
+                // Excluir o arquivo
+                f.delete();
             }
         }
+
     }
 
-    public static void deleteFolhas () {
+    public static void deleteFolhas() {
         File[] folhas = new File("./").listFiles();
 
         for (File f : folhas) {
@@ -53,7 +134,7 @@ public class Utils {
         }
     }
 
-    public static boolean validNome (String nome) throws Exception {
+    public static boolean validNome(String nome) throws Exception {
 
         if (nome.isEmpty()) {
             ExceptionEmpregado e = new ExceptionEmpregado();
@@ -64,7 +145,7 @@ public class Utils {
         return true;
     }
 
-    public static boolean validEndereco (String endereco) throws Exception {
+    public static boolean validEndereco(String endereco) throws Exception {
 
         if (endereco.isEmpty()) {
             ExceptionEmpregado e = new ExceptionEmpregado();
@@ -74,6 +155,7 @@ public class Utils {
 
         return true;
     }
+
     public static boolean sindicalizarEmpregado(String idSindicato, EmpregadoController empregadoController) throws Exception {
 
         boolean flag = true;
@@ -296,7 +378,7 @@ public class Utils {
         if (salario.isEmpty()) {
             ExceptionEmpregado ex = new ExceptionEmpregado();
             ex.msgSalarioNulo();
-            return  -1;
+            return -1;
         }
 
         ExceptionConversao e = new ExceptionConversao();
@@ -360,13 +442,13 @@ public class Utils {
         return true;
     }
 
-    public static boolean validAgendaPagamento(String agendaPagamento) throws Exception {
-        if (agendaPagamento.equals("semanal 5") || agendaPagamento.equals("semanal 2 5")
-                || agendaPagamento.equals("mensal $"))
-            return true;
+    public static boolean validAgendaPagamento(String agendaPagamento, ArrayList<String> agendaPagamentoList) throws Exception {
+
+        for (String s: agendaPagamentoList)
+            if (s.equals(agendaPagamento))
+                return true;
 
         ExceptionEmpregado e = new ExceptionEmpregado();
-
         e.msgAgendaPagamentoNaoDisponivel();
 
         return false;
@@ -525,7 +607,7 @@ public class Utils {
         return String.format(("%." + decimalPlaces + "f"), value).replace(".", ",");
     }
 
-    public static double convertDoubleToStringFormattPagamento (String value) {
+    public static double convertDoubleToStringFormattPagamento(String value) {
 
         int posicaoSeparador = value.indexOf(".");
 

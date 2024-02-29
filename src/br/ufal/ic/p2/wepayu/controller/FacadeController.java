@@ -1,6 +1,7 @@
 package br.ufal.ic.p2.wepayu.controller;
 
 import br.ufal.ic.p2.wepayu.database.EmpregadoXML;
+import br.ufal.ic.p2.wepayu.database.FolhaDePagamentoXML;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.*;
 import br.ufal.ic.p2.wepayu.utils.Utils;
@@ -13,16 +14,20 @@ import java.util.Map;
 public class FacadeController {
 
     private EmpregadoController empregadoController;
+    private FolhaDePagamentoController folhaDePagamentoController;
 
     public FacadeController () {
         this.empregadoController = new EmpregadoController();
-        EmpregadoXML xml = new EmpregadoXML();
-        this.empregadoController.setEmpregados(xml.readEmpregados());
+        this.folhaDePagamentoController = new FolhaDePagamentoController(SystemController.getSystemOn());
+        EmpregadoXML xmlEmpregado = new EmpregadoXML();
+        this.empregadoController.setEmpregados(xmlEmpregado.readEmpregados());
+        FolhaDePagamentoXML xmlFolha = new FolhaDePagamentoXML();
+        this.folhaDePagamentoController = xmlFolha.readFolha();
     }
     public void zerarSistema() throws Exception {
         SystemController.pushUndo(this.empregadoController);
-
         this.empregadoController = new EmpregadoController();
+        this.folhaDePagamentoController = new FolhaDePagamentoController(SystemController.getSystemOn());
         Utils.deleteFilesXML();
         Utils.deleteFolhas();
         System.out.println("-> Sistema zerado");
@@ -31,8 +36,10 @@ public class FacadeController {
     public void encerrarSistema () {
         System.out.println("-> Sistema encerrado");
 
-        EmpregadoXML xml = new EmpregadoXML();
-        xml.save(this.empregadoController.getEmpregados());
+        EmpregadoXML xmlEmpregado = new EmpregadoXML();
+        xmlEmpregado.save(this.empregadoController.getEmpregados());
+        FolhaDePagamentoXML xmlFolha = new FolhaDePagamentoXML();
+        xmlFolha.saveFolha(this.folhaDePagamentoController);
         SystemController.systemOff();
     }
 
@@ -364,7 +371,7 @@ public class FacadeController {
                     e.setEndereco(valor);
             }
             case "agendaPagamento" -> {
-                if (Utils.validAgendaPagamento(valor))
+                if (Utils.validAgendaPagamento(valor, this.folhaDePagamentoController.getAgendaDePagamentoList()))
                     e.setAgendaDePagamento(valor);
             }
             case "salario" -> {
@@ -519,24 +526,12 @@ public class FacadeController {
     }
 
     public String totalFolha(String data) throws Exception {
-
-        LocalDate dataFormato = Utils.validData(data, "");
-
-        FolhaDePagamento folha = new FolhaDePagamento(dataFormato);
-
-        double total = folha.totalFolha(this.empregadoController);
-
-        return Utils.convertDoubleToString(total, 2);
+        return this.folhaDePagamentoController.totalFolha(data, this.empregadoController);
     }
 
     public void rodaFolha(String data, String saida) throws Exception {
         SystemController.pushUndo(this.empregadoController);
-
-        LocalDate dataFormato = Utils.validData(data, "");
-
-        FolhaDePagamento folha = new FolhaDePagamento(dataFormato, saida);
-
-        folha.geraFolha(this.empregadoController);
+        this.folhaDePagamentoController.rodaFolha(data, saida, this.empregadoController);
     }
 
     public String getNumeroDeEmpregados() {
@@ -553,4 +548,9 @@ public class FacadeController {
     public void redo() throws Exception {
         this.empregadoController.setEmpregados(SystemController.popRedo());
     }
+
+    public void criarAgendaDePagamentos(String descricao) throws Exception {
+        this.folhaDePagamentoController.criarAgendaDePagamentos(descricao);
+    }
+
 }

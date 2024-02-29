@@ -2,6 +2,10 @@ package br.ufal.ic.p2.wepayu.exceptions;
 
 public class ExceptionConversao extends Exception {
 
+    public void msgDescricaoDeAgendaInvalida () throws Exception{
+        throw new Exception("Descricao de agenda invalida");
+    }
+
     public void msgValorDeveSerNumerico () throws Exception {
         throw new Exception("Valor deve ser numerico.");
     }
