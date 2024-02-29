@@ -17,7 +17,6 @@ public class FolhaDePagamento {
     private String arquivoSaida;
 
 
-
     public FolhaDePagamento(LocalDate dataCriacao, String arquivoSaida) {
         this.dataCriacao = dataCriacao;
         this.arquivoSaida = arquivoSaida;
@@ -342,8 +341,6 @@ public class FolhaDePagamento {
 
     public double totalFolha(EmpregadoController empregadoController) throws Exception {
 
-        FolhaDePagamentoController.incrementCountDay();
-
         double total = 0;
 
         HashMap<String, Empregado> empregados = empregadoController.getEmpregados();
@@ -352,17 +349,26 @@ public class FolhaDePagamento {
             Empregado e = entry.getValue();
 
             // Horista e é sexta-feira
-            if (e instanceof EmpregadoHorista && dataCriacao.getDayOfWeek() == DayOfWeek.FRIDAY) {
+            if (e.getAgendaDePagamento().equals("semanal 5") &&
+                    dataCriacao.getDayOfWeek() == DayOfWeek.FRIDAY) {
                 LocalDate dataInicial = dataCriacao.minusDays(6);
 
-                double salarioBruto = ((EmpregadoHorista) e).getSalarioBruto(dataInicial, dataCriacao);
+                double salarioBruto;
+
+                if (e.getTipo().equals("horista")) {
+                    salarioBruto = ((EmpregadoHorista) e).getSalarioBruto(dataInicial, dataCriacao);
+                } else if (e.getTipo().equals("assalariado")) {
+                    salarioBruto = ((EmpregadoAssalariado) e).getSalarioBruto();
+                } else {
+                    salarioBruto = ((EmpregadoComissionado) e).getSalarioBruto(dataInicial, dataCriacao);
+                }
+
                 salarioBruto = ((int)(salarioBruto*100))/100f;
                 total +=  salarioBruto;
 
 
             // Comissionado, sexta-feira e multiplo d
-            } else if (e instanceof  EmpregadoComissionado )
-                     {
+            } else if (e.getAgendaDePagamento().equals("semanal 2 5")) {
 
                 boolean multiplo =  (ChronoUnit.DAYS.between(LocalDate.of(2005, 1, 1), dataCriacao) + 1) % 14 == 0;
 
@@ -372,16 +378,33 @@ public class FolhaDePagamento {
 
                 LocalDate dataInicial = dataCriacao.minusDays(13);
 
-                double salarioBruto = ((EmpregadoComissionado) e).getSalarioBruto(dataInicial, dataCriacao);
+                double salarioBruto;
 
+                if (e.getTipo().equals("horista")) {
+                    salarioBruto = ((EmpregadoHorista) e).getSalarioBruto(dataInicial, dataCriacao);
+                } else if (e.getTipo().equals("assalariado")){
+                    salarioBruto = ((EmpregadoAssalariado) e).getSalarioBruto();
+                } else {
+                    salarioBruto = ((EmpregadoComissionado) e).getSalarioBruto(dataInicial, dataCriacao);
+                }
 
                 total += salarioBruto ;
-            } else if (e instanceof EmpregadoAssalariado &&
+            } else if (e.getAgendaDePagamento().equals("mensal $") &&
                     dataCriacao.getDayOfMonth() == dataCriacao.lengthOfMonth()) {
 
-                double salarioBruto =  e.getSalario();
-                salarioBruto = ((int)(salarioBruto*100))/100f;
+                double salarioBruto;
 
+                if (e.getTipo().equals("horista")) {
+                    LocalDate dataInicial = dataCriacao.minusDays(dataCriacao.lengthOfMonth() - 1);
+                    salarioBruto = ((EmpregadoHorista) e).getSalarioBruto(dataInicial, dataCriacao);
+                } else if (e.getTipo().equals("assalariado")) {
+                    salarioBruto = ((EmpregadoAssalariado) e).getSalarioBruto();
+                } else {
+                    LocalDate dataInicial = dataCriacao.minusDays(dataCriacao.lengthOfMonth() - 1);
+                    salarioBruto = ((EmpregadoComissionado) e).getSalarioBruto(dataInicial, dataCriacao);
+                }
+
+                salarioBruto = ((int) (salarioBruto * 100)) / 100f;
                 total += salarioBruto;
             }
 

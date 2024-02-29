@@ -8,8 +8,8 @@ public class EmpregadoAssalariado extends Empregado {
 
     }
 
-    public EmpregadoAssalariado(String nome, String endereco, double salarioMensal) {
-        super(nome, endereco);
+    public EmpregadoAssalariado(String nome, String endereco, String agendaDePagamento, double salarioMensal) {
+        super(nome, endereco, agendaDePagamento);
         this.salarioMensal = salarioMensal;
     }
 
@@ -17,7 +17,15 @@ public class EmpregadoAssalariado extends Empregado {
         return salarioMensal;
     }
 
-    public double getSalarioBruto() { return salarioMensal; }
+    public double getSalarioBruto() {
+        if (super.getAgendaDePagamento().equals("semanal 2 5")) {
+            return Math.floor((this.salarioMensal*12D/52D)*2D * 100)/100F;
+        } else if (super.getAgendaDePagamento().equals("semanal 5")) {
+            return Math.floor((this.salarioMensal*12D/52D) * 100)/100F;
+        } else {
+            return this.salarioMensal;
+        }
+    }
 
     @Override
     public MembroSindicalizado getSindicalizado() {

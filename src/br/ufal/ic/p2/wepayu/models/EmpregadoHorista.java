@@ -16,8 +16,8 @@ public class EmpregadoHorista extends Empregado {
 
     }
 
-    public EmpregadoHorista(String nome, String endereco, double salarioPorHora) {
-        super(nome, endereco);
+    public EmpregadoHorista(String nome, String endereco, String agendaDePagamento, double salarioPorHora) {
+        super(nome, endereco, agendaDePagamento);
         this.salarioPorHora = salarioPorHora;
         this.cartao = new ArrayList<CartaoDePonto>();
         this.descontos = 0;

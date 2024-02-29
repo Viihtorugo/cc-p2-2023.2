@@ -52,9 +52,9 @@ public class FacadeController {
             return null;
 
         if (tipo.equals("assalariado")) {
-            return this.empregadoController.setEmpregado(new EmpregadoAssalariado(nome, endereco, salarioFormato));
+            return this.empregadoController.setEmpregado(new EmpregadoAssalariado(nome, endereco, "mensal $", salarioFormato));
         } else if (tipo.equals("horista")) {
-            return this.empregadoController.setEmpregado(new EmpregadoHorista(nome, endereco, salarioFormato));
+            return this.empregadoController.setEmpregado(new EmpregadoHorista(nome, endereco, "semanal 5", salarioFormato));
         }
 
         return null;
@@ -83,7 +83,7 @@ public class FacadeController {
             return null;
         }
 
-        return this.empregadoController.setEmpregado(new EmpregadoComissionado(nome, endereco, salarioFormato, comissaoFormato));
+        return this.empregadoController.setEmpregado(new EmpregadoComissionado(nome, endereco, "semanal 2 5", salarioFormato, comissaoFormato));
     }
 
     public void lancaCartao(String emp, String data, String horas) throws Exception {
@@ -180,6 +180,9 @@ public class FacadeController {
 
             case "nome" -> {
                 return e.getNome();
+            }
+            case "agendaPagamento" -> {
+                return e.getAgendaDePagamento();
             }
             case "tipo" -> {
                 return e.getTipo();
@@ -360,6 +363,10 @@ public class FacadeController {
                 if (Utils.validEndereco(valor))
                     e.setEndereco(valor);
             }
+            case "agendaPagamento" -> {
+                if (Utils.validAgendaPagamento(valor))
+                    e.setAgendaDePagamento(valor);
+            }
             case "salario" -> {
                 double salario = Utils.validSalario(valor);
 
@@ -396,11 +403,11 @@ public class FacadeController {
                 double salario = e.getSalario();
 
                 switch (valor) {
-                    case "horista" -> this.empregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, salario));
+                    case "horista" -> this.empregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, "semanal 5", salario));
                     case "assalariado" ->
-                            this.empregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, salario));
+                            this.empregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, "mensal $", salario));
                     case "comissionado" ->
-                            this.empregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, 0));
+                            this.empregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, "semanal 2 5", salario, 0));
                 }
             }
 
@@ -441,7 +448,7 @@ public class FacadeController {
             if (comissao < 0)
                 return;
 
-            this.empregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, salario, comissao));
+            this.empregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, "semanal 2 5", salario, comissao));
 
         } else if (valor.equals("horista")) {
             double novoSalario = Utils.validSalario(sal);
@@ -449,7 +456,7 @@ public class FacadeController {
             if (novoSalario < 0)
                 return;
 
-            this.empregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, novoSalario));
+            this.empregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, "semanal 5", novoSalario));
         }
     }
 

@@ -3,6 +3,7 @@ package br.ufal.ic.p2.wepayu.models;
 public abstract class Empregado{
     private String nome;
     private String endereco;
+    private String agendaDePagamento;
     private MembroSindicalizado sindicalizado;
     private MetodoPagamento metodoPagamento;
 
@@ -10,11 +11,20 @@ public abstract class Empregado{
 
     }
 
-    public Empregado(String nome, String endereco) {
+    public Empregado(String nome, String endereco, String agendaDePagamento) {
         this.nome = nome;
         this.endereco = endereco;
+        this.agendaDePagamento = agendaDePagamento;
         this.sindicalizado = null;
         this.metodoPagamento = new EmMaos();
+    }
+
+    public String getAgendaDePagamento() {
+        return agendaDePagamento;
+    }
+
+    public void setAgendaDePagamento(String agendaDePagamento) {
+        this.agendaDePagamento = agendaDePagamento;
     }
 
     public void setSindicalizado(MembroSindicalizado sindicalizado) {

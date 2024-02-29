@@ -360,6 +360,18 @@ public class Utils {
         return true;
     }
 
+    public static boolean validAgendaPagamento(String agendaPagamento) throws Exception {
+        if (agendaPagamento.equals("semanal 5") || agendaPagamento.equals("semanal 2 5")
+                || agendaPagamento.equals("mensal $"))
+            return true;
+
+        ExceptionEmpregado e = new ExceptionEmpregado();
+
+        e.msgAgendaPagamentoNaoDisponivel();
+
+        return false;
+    }
+
     public static boolean validBanco(String banco, String agencia, String contaCorrente) throws Exception {
         ExceptionEmpregado e = new ExceptionEmpregado();
 
@@ -398,7 +410,7 @@ public class Utils {
             case "nome", "tipo", "salario", "endereco",
                     "comissao", "metodoPagamento", "banco",
                     "agencia", "contaCorrente", "sindicalizado",
-                    "idSindicato", "taxaSindical" -> {
+                    "idSindicato", "taxaSindical", "agendaPagamento" -> {
                 return true;
             }
             default -> {

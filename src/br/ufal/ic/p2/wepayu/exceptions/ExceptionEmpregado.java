@@ -2,6 +2,10 @@ package br.ufal.ic.p2.wepayu.exceptions;
 
 public class ExceptionEmpregado extends Exception {
 
+    public void msgAgendaPagamentoNaoDisponivel () throws Exception {
+        throw new Exception("Agenda de pagamento nao esta disponivel");
+    }
+
     public void msgContaCorrenteNulo () throws Exception{
         throw new Exception("Conta corrente nao pode ser nulo.");
     }

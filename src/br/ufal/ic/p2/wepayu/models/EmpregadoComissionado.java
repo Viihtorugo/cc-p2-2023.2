@@ -16,8 +16,8 @@ public class EmpregadoComissionado extends Empregado {
 
     }
 
-    public EmpregadoComissionado(String nome, String endereco, double salarioMensal, double taxaDeComissao) {
-        super(nome, endereco);
+    public EmpregadoComissionado(String nome, String endereco, String agendaDePagamento, double salarioMensal, double taxaDeComissao) {
+        super(nome, endereco, agendaDePagamento);
         this.taxaDeComissao = taxaDeComissao;
         this.salarioMensal = salarioMensal;
         this.vendas = new ArrayList<CartaoDeVenda>();
@@ -108,9 +108,12 @@ public class EmpregadoComissionado extends Empregado {
         comissao = Math.floor(comissao*100)/100F;
 
         double salarioFixo = getSalario();
-        salarioFixo = Math.floor((salarioFixo*12D/52D)*2D * 100)/100F;
 
-
+        if (super.getAgendaDePagamento().equals("semanal 2 5")) {
+            salarioFixo = Math.floor((salarioFixo*12D/52D)*2D * 100)/100F;
+        } else if (super.getAgendaDePagamento().equals("semanal 5")) {
+            salarioFixo = Math.floor((salarioFixo*12D/52D) * 100)/100F;
+        }
 
         return comissao + salarioFixo;
     }
