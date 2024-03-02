@@ -1,5 +1,7 @@
 package br.ufal.ic.p2.wepayu.strategy.criarempregado;
 
+import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
+import br.ufal.ic.p2.wepayu.controller.SystemController;
 import br.ufal.ic.p2.wepayu.exceptions.*;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.EmpregadoAssalariado;
@@ -76,11 +78,17 @@ public class CriarEmpregado implements StrategyCriarEmpregado {
     }
 
     @Override
-    public Empregado executeCriarEmpregado(String nome, String endereco, String tipo, String salario) {
-
+    public Empregado executeCriarEmpregado(String nome, String endereco, String tipo,
+                                           String salario, EmpregadoController empregadoController) {
 
         if (validNome(nome) && validEndereco(endereco)
                 && validTipoNaoComissionado(tipo) && validSalario(salario)) {
+
+            try {
+                SystemController.pushUndo(empregadoController);
+            } catch (Exception e) {
+                throw new RuntimeException("Deu errado!");
+            }
 
             double salarioFormatado = Utils.convertStringToDouble(salario);
 
@@ -95,10 +103,18 @@ public class CriarEmpregado implements StrategyCriarEmpregado {
     }
 
     @Override
-    public Empregado executeCriarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) {
+    public Empregado executeCriarEmpregado(String nome, String endereco, String tipo,
+                                           String salario, String comissao,
+                                           EmpregadoController empregadoController) {
 
         if (validNome(nome) && validEndereco(endereco) && validTipoComissionado(tipo)
                 && validSalario(salario) && validComissao(comissao)) {
+
+            try {
+                SystemController.pushUndo(empregadoController);
+            } catch (Exception e) {
+                throw new RuntimeException("Deu errado!");
+            }
 
             double salarioFormatado = Utils.convertStringToDouble(salario);
             double comissaoFormatado = Utils.convertStringToDouble(comissao);

@@ -16,6 +16,7 @@ import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista.
 import br.ufal.ic.p2.wepayu.strategy.Contexto;
 import br.ufal.ic.p2.wepayu.strategy.criarempregado.CriarEmpregado;
 import br.ufal.ic.p2.wepayu.strategy.getatributo.GetAtributo;
+import br.ufal.ic.p2.wepayu.strategy.removerempregado.RemoverEmpregado;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
 import java.io.File;
@@ -61,7 +62,7 @@ public class FacadeController {
 
         Contexto contexto = new Contexto();
 
-        Empregado emp = contexto.criarEmpregado(new CriarEmpregado(), nome, endereco, tipo, salario);
+        Empregado emp = contexto.criarEmpregado(new CriarEmpregado(), nome, endereco, tipo, salario, empregadoController);
 
         return this.empregadoController.setEmpregado(emp);
     }
@@ -72,7 +73,8 @@ public class FacadeController {
 
         Contexto contexto = new Contexto();
 
-        Empregado emp = contexto.criarEmpregado(new CriarEmpregado(), nome, endereco, tipo, salario, comissao);
+        Empregado emp = contexto.criarEmpregado(new CriarEmpregado(), nome, endereco,
+                                                tipo, salario, comissao, this.empregadoController);
 
         return this.empregadoController.setEmpregado(emp);
     }
@@ -494,21 +496,9 @@ public class FacadeController {
     }
 
     public void removerEmpregado(String emp) throws Exception {
-        SystemController.pushUndo(this.empregadoController);
 
-        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
-
-        if (e == null)
-            return;
-
-        File file = new File( emp + ".xml" );
-
-        if (file.exists()) {
-            System.out.println("Empredado deletado!");
-            file.delete();
-        }
-
-        this.empregadoController.removeEmpregado(emp);
+        Contexto contexto = new Contexto();
+        contexto.removerEmpregado(new RemoverEmpregado(), emp, this.empregadoController);
     }
 
     public String totalFolha(String data) throws Exception {
