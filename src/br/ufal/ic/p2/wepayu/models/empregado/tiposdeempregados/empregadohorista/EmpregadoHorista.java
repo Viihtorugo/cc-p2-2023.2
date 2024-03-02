@@ -1,6 +1,7 @@
-package br.ufal.ic.p2.wepayu.models;
+package br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista;
 
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
+import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
 import java.time.LocalDate;

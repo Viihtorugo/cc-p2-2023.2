@@ -1,8 +1,7 @@
 package br.ufal.ic.p2.wepayu.controller;
 
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionSystem;
-import br.ufal.ic.p2.wepayu.models.Empregado;
+import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 
 import java.util.HashMap;
 import java.util.Stack;

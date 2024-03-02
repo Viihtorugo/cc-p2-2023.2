@@ -1,4 +1,9 @@
-package br.ufal.ic.p2.wepayu.models;
+package br.ufal.ic.p2.wepayu.models.empregado;
+
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.TaxaServico;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.EmMaos;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
 
 public abstract class Empregado{
     private String nome;

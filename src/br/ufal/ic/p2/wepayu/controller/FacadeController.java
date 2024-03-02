@@ -3,7 +3,19 @@ package br.ufal.ic.p2.wepayu.controller;
 import br.ufal.ic.p2.wepayu.database.EmpregadoXML;
 import br.ufal.ic.p2.wepayu.database.FolhaDePagamentoXML;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
-import br.ufal.ic.p2.wepayu.models.*;
+import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.TaxaServico;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.Banco;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.Correios;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.EmMaos;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.EmpregadoAssalariado;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado.EmpregadoComissionado;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista.EmpregadoHorista;
+import br.ufal.ic.p2.wepayu.strategy.Contexto;
+import br.ufal.ic.p2.wepayu.strategy.criarempregado.CriarEmpregado;
+import br.ufal.ic.p2.wepayu.strategy.getatributo.GetAtributo;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
 import java.io.File;
@@ -47,50 +59,22 @@ public class FacadeController {
     public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws Exception {
         SystemController.pushUndo(this.empregadoController);
 
-        if (!Utils.validCriarEmpregado(nome, endereco, tipo, salario))
-            return null;
+        Contexto contexto = new Contexto();
 
-        if (!Utils.validTipoNotComissionado(tipo))
-            return null;
+        Empregado emp = contexto.criarEmpregado(new CriarEmpregado(), nome, endereco, tipo, salario);
 
-        double salarioFormato = Utils.validSalario(salario);
-
-        if (salarioFormato <= 0)
-            return null;
-
-        if (tipo.equals("assalariado")) {
-            return this.empregadoController.setEmpregado(new EmpregadoAssalariado(nome, endereco, "mensal $", salarioFormato));
-        } else if (tipo.equals("horista")) {
-            return this.empregadoController.setEmpregado(new EmpregadoHorista(nome, endereco, "semanal 5", salarioFormato));
-        }
-
-        return null;
+        return this.empregadoController.setEmpregado(emp);
     }
 
+    //5 variaveis - Empregado Comissionado
     public String criarEmpregado (String nome, String endereco, String tipo, String salario, String comissao) throws Exception {
         SystemController.pushUndo(this.empregadoController);
 
-        if (!Utils.validCriarEmpregado(nome, endereco, tipo, salario, comissao)) {
-            return null;
-        }
+        Contexto contexto = new Contexto();
 
-        if (!Utils.validTipoComissionado(tipo)) {
-            return null;
-        }
+        Empregado emp = contexto.criarEmpregado(new CriarEmpregado(), nome, endereco, tipo, salario, comissao);
 
-        double salarioFormato = Utils.validSalario(salario);
-
-        if (salarioFormato <= 0) {
-            return null;
-        }
-
-        double comissaoFormato = Utils.validComissao(comissao);
-
-        if (comissaoFormato <= 0) {
-            return null;
-        }
-
-        return this.empregadoController.setEmpregado(new EmpregadoComissionado(nome, endereco, "semanal 2 5", salarioFormato, comissaoFormato));
+        return this.empregadoController.setEmpregado(emp);
     }
 
     public void lancaCartao(String emp, String data, String horas) throws Exception {
@@ -175,74 +159,76 @@ public class FacadeController {
     }
 
     public String getAtributoEmpregado(String emp, String atributo) throws Exception {
-        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
+//        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
+//
+//        if (e == null)
+//            return null;
+//
+//        if (!Utils.validGetAtributo(emp, atributo))
+//            return null;
+//
+//        switch (atributo) {
+//
+//            case "nome" -> {
+//                return e.getNome();
+//            }
+//            case "agendaPagamento" -> {
+//                return e.getAgendaDePagamento();
+//            }
+//            case "tipo" -> {
+//                return e.getTipo();
+//            }
+//            case "salario" -> {
+//                return Utils.convertDoubleToString(e.getSalario(), 2);
+//            }
+//            case "endereco" -> {
+//                return e.getEndereco();
+//            }
+//            case "comissao" -> {
+//
+//                if (Utils.empregadoIsNotComissionado(e))
+//                    return Utils.convertDoubleToString(((EmpregadoComissionado) e).getTaxaDeComissao(), 2);
+//
+//                return null;
+//            }
+//
+//            case "metodoPagamento" -> {
+//                return e.getMetodoPagamento().getMetodoPagamento();
+//            }
+//
+//            case "banco", "agencia", "contaCorrente" -> {
+//                MetodoPagamento metodoPagamento = e.getMetodoPagamento();
+//
+//                if (!Utils.metodoPagamentoIsBanco(metodoPagamento))
+//                    return null;
+//
+//                if (atributo.equals("banco")) return ((Banco) metodoPagamento).getBanco();
+//                if (atributo.equals("agencia")) return ((Banco) metodoPagamento).getAgencia();
+//
+//                return ((Banco) metodoPagamento).getContaCorrente();
+//            }
+//
+//            case "sindicalizado" -> {
+//                if (e.getSindicalizado() == null) return "false";
+//                else return "true";
+//            }
+//
+//            case "idSindicato", "taxaSindical" -> {
+//                MembroSindicalizado ms = e.getSindicalizado();
+//
+//                if (!Utils.validSindicato(ms))
+//                    return null;
+//
+//                if (atributo.equals("idSindicato")) return ms.getIdMembro();
+//
+//                return Utils.convertDoubleToString(e.getSindicalizado().getTaxaSindical(), 2);
+//            }
+//
+//        }
 
-        if (e == null)
-            return null;
+        Contexto contexto = new Contexto();
 
-        if (!Utils.validGetAtributo(emp, atributo))
-            return null;
-
-        switch (atributo) {
-
-            case "nome" -> {
-                return e.getNome();
-            }
-            case "agendaPagamento" -> {
-                return e.getAgendaDePagamento();
-            }
-            case "tipo" -> {
-                return e.getTipo();
-            }
-            case "salario" -> {
-                return Utils.convertDoubleToString(e.getSalario(), 2);
-            }
-            case "endereco" -> {
-                return e.getEndereco();
-            }
-            case "comissao" -> {
-
-                if (Utils.empregadoIsNotComissionado(e))
-                    return Utils.convertDoubleToString(((EmpregadoComissionado) e).getTaxaDeComissao(), 2);
-
-                return null;
-            }
-
-            case "metodoPagamento" -> {
-                return e.getMetodoPagamento().getMetodoPagamento();
-            }
-
-            case "banco", "agencia", "contaCorrente" -> {
-                MetodoPagamento metodoPagamento = e.getMetodoPagamento();
-
-                if (!Utils.metodoPagamentoIsBanco(metodoPagamento))
-                    return null;
-
-                if (atributo.equals("banco")) return ((Banco) metodoPagamento).getBanco();
-                if (atributo.equals("agencia")) return ((Banco) metodoPagamento).getAgencia();
-
-                return ((Banco) metodoPagamento).getContaCorrente();
-            }
-
-            case "sindicalizado" -> {
-                if (e.getSindicalizado() == null) return "false";
-                else return "true";
-            }
-
-            case "idSindicato", "taxaSindical" -> {
-                MembroSindicalizado ms = e.getSindicalizado();
-
-                if (!Utils.validSindicato(ms))
-                    return null;
-
-                if (atributo.equals("idSindicato")) return ms.getIdMembro();
-
-                return Utils.convertDoubleToString(e.getSindicalizado().getTaxaSindical(), 2);
-            }
-
-        }
-
-        return null;
+        return contexto.getAtributo(new GetAtributo(), emp, atributo, this.empregadoController);
     }
 
     public String getHorasNormaisTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception {

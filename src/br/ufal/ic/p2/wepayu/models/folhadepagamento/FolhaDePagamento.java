@@ -1,7 +1,11 @@
-package br.ufal.ic.p2.wepayu.models;
+package br.ufal.ic.p2.wepayu.models.folhadepagamento;
 
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
-import br.ufal.ic.p2.wepayu.controller.FolhaDePagamentoController;
+import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.EmpregadoAssalariado;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado.EmpregadoComissionado;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista.EmpregadoHorista;
 import br.ufal.ic.p2.wepayu.utils.EmpregadoUtils;
 import br.ufal.ic.p2.wepayu.utils.FolhaDePagamentoUtils;
 import br.ufal.ic.p2.wepayu.utils.Utils;
@@ -76,7 +80,6 @@ public class FolhaDePagamento {
         double totalSalarioBruto = 0;
         double totalDescontos = 0;
         double totalSalarioLiquido = 0;
-
 
         FolhaDePagamentoUtils.writeEmpregadoHeader(escritor, "ASSALARIADOS");
 

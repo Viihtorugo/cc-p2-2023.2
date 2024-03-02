@@ -1,7 +1,4 @@
-import br.ufal.ic.p2.wepayu.models.Empregado;
 import easyaccept.EasyAccept;
-
-import java.util.ArrayList;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
@@ -13,7 +10,7 @@ public class Main {
         String facade = "br.ufal.ic.p2.wepayu.Facade";
 //        EasyAccept.main(new String[]{facade, "tests/us1.txt"});
 //        EasyAccept.main(new String[]{facade, "tests/us1_1.txt"});
-//        EasyAccept.main(new String[]{facade, "tests/us2.txt"});
+        EasyAccept.main(new String[]{facade, "tests/us2.txt"});
 //        EasyAccept.main(new String[]{facade, "tests/us2_1.txt"});
 //        EasyAccept.main(new String[]{facade, "tests/us3.txt"});
 //        EasyAccept.main(new String[]{facade, "tests/us3_1.txt"});
@@ -28,7 +25,7 @@ public class Main {
 //        EasyAccept.main(new String[]{facade, "tests/us8.txt"});
 //        EasyAccept.main(new String[]{facade, "tests/us9.txt"});
 //        EasyAccept.main(new String[]{facade, "tests/us9_1.txt"});
-        EasyAccept.main(new String[]{facade, "tests/us10.txt"});
+//        EasyAccept.main(new String[]{facade, "tests/us10.txt"});
 //        EasyAccept.main(new String[]{facade, "tests/us10_1.txt"});
     }
 }

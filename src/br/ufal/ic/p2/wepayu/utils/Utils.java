@@ -4,7 +4,10 @@ import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionConversao;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionMetodosDePagamento;
-import br.ufal.ic.p2.wepayu.models.*;
+import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.Banco;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -589,15 +592,6 @@ public class Utils {
         return false;
     }
 
-    public static LocalDate isValidDateString(String date) throws Exception {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
-            return LocalDate.parse(date, formatter);
-        } catch (DateTimeParseException e) {
-            throw new Exception("Data inválida.");
-        }
-    }
-
     public static String convertDoubleToString(double value) {
         if (value != (int) value) return Double.toString(value).replace('.', ',');
         else return Integer.toString((int) value);
@@ -607,14 +601,7 @@ public class Utils {
         return String.format(("%." + decimalPlaces + "f"), value).replace(".", ",");
     }
 
-    public static double convertDoubleToStringFormattPagamento(String value) {
-
-        int posicaoSeparador = value.indexOf(".");
-
-        if (posicaoSeparador + 3 < value.length()) {
-            value = value.substring(0, posicaoSeparador + 3);
-        }
-
+    public static double convertStringToDouble(String value) {
         return Double.parseDouble(value.replace(",", "."));
     }
 

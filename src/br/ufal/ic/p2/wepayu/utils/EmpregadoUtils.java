@@ -1,9 +1,6 @@
 package br.ufal.ic.p2.wepayu.utils;
 
-import br.ufal.ic.p2.wepayu.models.Empregado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoAssalariado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoHorista;
+import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 
 
 import java.util.*;

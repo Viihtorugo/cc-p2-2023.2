@@ -1,15 +1,11 @@
 package br.ufal.ic.p2.wepayu.controller;
 
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionFolhaDePagamento;
-import br.ufal.ic.p2.wepayu.models.Empregado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
-import br.ufal.ic.p2.wepayu.models.FolhaDePagamento;
+import br.ufal.ic.p2.wepayu.models.folhadepagamento.FolhaDePagamento;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class FolhaDePagamentoController {
 

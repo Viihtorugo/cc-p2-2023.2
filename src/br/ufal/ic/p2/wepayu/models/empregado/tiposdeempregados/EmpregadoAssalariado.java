@@ -1,4 +1,8 @@
-package br.ufal.ic.p2.wepayu.models;
+package br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados;
+
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
+import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 
 public class EmpregadoAssalariado extends Empregado {
 

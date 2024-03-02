@@ -1,14 +1,21 @@
 package br.ufal.ic.p2.wepayu.controller;
 
-import br.ufal.ic.p2.wepayu.database.EmpregadoAssalariadoXML;
-import br.ufal.ic.p2.wepayu.database.EmpregadoComissionadoXML;
-import br.ufal.ic.p2.wepayu.database.EmpregadoHoristaXML;
-import br.ufal.ic.p2.wepayu.models.*;
+import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.TaxaServico;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.Banco;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.Correios;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.EmMaos;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.EmpregadoAssalariado;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado.CartaoDeVenda;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado.EmpregadoComissionado;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista.CartaoDePonto;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista.EmpregadoHorista;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 public class EmpregadoController {
 
@@ -23,7 +30,6 @@ public class EmpregadoController {
     public HashMap<String, Empregado> getEmpregados() {
         return this.empregados;
     }
-
     public void setEmpregados(HashMap<String, Empregado> empregados) {
 
         for (Map.Entry<String, Empregado> entry : this.empregados.entrySet()) {
@@ -47,10 +53,14 @@ public class EmpregadoController {
     }
 
     public String setEmpregado(Empregado e) {
-        this.key++;
-        String id = Integer.toString(key);
-        this.empregados.put(id, e);
-        return id;
+        if (e != null) {
+            this.key++;
+            String id = Integer.toString(key);
+            this.empregados.put(id, e);
+            return id;
+        }
+
+        return null;
     }
 
     public void removeEmpregado(String key) {

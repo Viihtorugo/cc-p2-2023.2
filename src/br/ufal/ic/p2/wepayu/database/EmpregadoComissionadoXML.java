@@ -1,6 +1,6 @@
 package br.ufal.ic.p2.wepayu.database;
 
-import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado.EmpregadoComissionado;
 
 import java.beans.XMLEncoder;
 import java.io.BufferedOutputStream;

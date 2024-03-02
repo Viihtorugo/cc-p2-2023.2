@@ -1,6 +1,6 @@
 package br.ufal.ic.p2.wepayu.database;
 
-import br.ufal.ic.p2.wepayu.models.EmpregadoAssalariado;
+import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.EmpregadoAssalariado;
 
 import java.beans.XMLEncoder;
 import java.io.BufferedOutputStream;
@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class EmpregadoAssalariadoXML {
-
     public void save(String id, EmpregadoAssalariado empregado) {
 
         try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream( id + ".xml")))) {

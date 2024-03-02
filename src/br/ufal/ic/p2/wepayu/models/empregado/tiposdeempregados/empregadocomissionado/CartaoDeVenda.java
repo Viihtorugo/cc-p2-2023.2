@@ -1,4 +1,4 @@
-package br.ufal.ic.p2.wepayu.models;
+package br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado;
 
 import java.lang.String;
 

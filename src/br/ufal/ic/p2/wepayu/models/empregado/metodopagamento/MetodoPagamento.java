@@ -1,4 +1,4 @@
-package br.ufal.ic.p2.wepayu.models;
+package br.ufal.ic.p2.wepayu.models.empregado.metodopagamento;
 
 public abstract class MetodoPagamento {
 
