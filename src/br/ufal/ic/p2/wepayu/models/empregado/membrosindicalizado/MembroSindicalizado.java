@@ -1,5 +1,6 @@
 package br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado;
 
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionDataInicialNaoPodeSerPosteriorAaDataFinal;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
@@ -21,15 +22,12 @@ public class MembroSindicalizado {
         this.taxaServicos = new ArrayList<>();
     }
 
-    public double getTaxaServicos(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
+    public double getTaxaServicos(LocalDate dataInicial, LocalDate dataFinal) {
 
         double countTaxas = 0;
 
         if (dataInicial.isAfter(dataFinal)) {
-            ExceptionEmpregado e = new ExceptionEmpregado();
-            e.msgDataInicialPosteriorDataFinal();
-
-            return countTaxas;
+            throw new ExceptionDataInicialNaoPodeSerPosteriorAaDataFinal();
         }
 
         if (dataInicial.isEqual(dataFinal)) {
@@ -38,7 +36,7 @@ public class MembroSindicalizado {
 
         for (TaxaServico t : this.taxaServicos) {
 
-            LocalDate dataFormato = Utils.validData(t.getData(), "");
+            LocalDate dataFormato = Utils.convertStringToLocalDate(t.getData());
 
             if (dataFormato != null) {
                 if (dataFormato.isEqual(dataInicial) ||

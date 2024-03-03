@@ -12,4 +12,5 @@ public class ExceptionSystem extends Exception{
     public void msgNaoPodeDarComandos() throws Exception {
         throw new Exception("Nao pode dar comandos depois de encerrarSistema.");
     }
+
 }

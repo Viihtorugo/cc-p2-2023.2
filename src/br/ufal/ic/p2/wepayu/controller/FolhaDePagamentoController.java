@@ -1,6 +1,8 @@
 package br.ufal.ic.p2.wepayu.controller;
 
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionFolhaDePagamento;
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionAgendaDePagamentoNaoEstaDisponivel;
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionAgendaDePagamentosJaExiste;
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionTipoInvalido;
 import br.ufal.ic.p2.wepayu.models.folhadepagamento.FolhaDePagamento;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
@@ -15,14 +17,12 @@ public class FolhaDePagamentoController {
 
     }
 
-    public FolhaDePagamentoController (boolean systemOn) {
+    public FolhaDePagamentoController (boolean v) {
         this.agendaDePagamentoList = new ArrayList<>();
 
-        if (systemOn) {
-            this.agendaDePagamentoList.add("semanal 5");
-            this.agendaDePagamentoList.add("semanal 2 5");
-            this.agendaDePagamentoList.add("mensal $");
-        }
+        this.agendaDePagamentoList.add("semanal 5");
+        this.agendaDePagamentoList.add("semanal 2 5");
+        this.agendaDePagamentoList.add("mensal $");
     }
 
     public ArrayList<String> getAgendaDePagamentoList() {
@@ -33,17 +33,26 @@ public class FolhaDePagamentoController {
         this.agendaDePagamentoList = agendaDePagamentoList;
     }
 
-    public boolean verificarAgendaDePagamento(String descricao) throws Exception {
+    public boolean verificarAgendaDePagamento(String descricao) {
 
         for (String s: this.agendaDePagamentoList) {
             if (s.equals(descricao)) {
-                ExceptionFolhaDePagamento e = new ExceptionFolhaDePagamento();
-                e.msgAgendaDePagamentosJaExiste();
-                return false;
+                throw new ExceptionAgendaDePagamentosJaExiste();
             }
         }
 
         return true;
+    }
+
+    public boolean alterarAgendaDePagamentoDoEmpregado(String descricao) {
+
+        for (String s: this.agendaDePagamentoList) {
+            if (s.equals(descricao)) {
+                return true;
+            }
+        }
+
+        throw new ExceptionAgendaDePagamentoNaoEstaDisponivel();
     }
 
     public void criarAgendaDePagamentos (String descricao) throws Exception {

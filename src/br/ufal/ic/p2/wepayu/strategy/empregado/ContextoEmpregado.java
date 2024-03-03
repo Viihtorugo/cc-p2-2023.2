@@ -120,12 +120,41 @@ public class ContextoEmpregado implements StrategyEmpregado {
         }
     }
 
+    public String getTaxasServico(String emp, String dataInicial, String dataFinal,
+                                  EmpregadoController empregadoController) {
+
+        if (this.verification.validEmpregado(emp, empregadoController)) {
+            Empregado empregado = empregadoController.getEmpregado(emp);
+
+            if (this.verification.validMembroSindicalizado(empregado)) {
+                MembroSindicalizado membroSindicalizado = empregado.getSindicalizado();
+
+                if (this.verification.validData(dataInicial, " inicial ")) {
+                    if (this.verification.validData(dataFinal, " final ")) {
+
+
+                        LocalDate dataInicialFormato = Utils.convertStringToLocalDate(dataInicial);
+                        LocalDate dataFinalFormato = Utils.convertStringToLocalDate(dataFinal);
+
+
+                        double taxa = membroSindicalizado.getTaxaServicos(dataInicialFormato, dataFinalFormato);
+
+                        return Utils.convertDoubleToString(taxa, 2);
+                    }
+                }
+            }
+        }
+
+        return "0,00";
+    }
+
+
+
     //3 variaveis
     @Override
     public void executeAlteraEmpregado(String emp, String atributo, String valor,
                                        EmpregadoController empregadoController,
                                        FolhaDePagamentoController folhaDePagamentoController) {
-
 
         if (this.verification.validEmpregado(emp, empregadoController)) {
             if (this.verification.validGetAtributo(atributo)) {
@@ -141,9 +170,10 @@ public class ContextoEmpregado implements StrategyEmpregado {
                             empregado.setEndereco(valor);
                     }
                     case "agendaPagamento" -> {
-                        if (this.verification.validAgendaPagamento(valor,
-                                folhaDePagamentoController.getAgendaDePagamentoList()))
+
+                        if (folhaDePagamentoController.alterarAgendaDePagamentoDoEmpregado(valor)) {
                             empregado.setAgendaDePagamento(valor);
+                        }
                     }
                     case "salario" -> {
                         if (this.verification.validSalario(valor)) {

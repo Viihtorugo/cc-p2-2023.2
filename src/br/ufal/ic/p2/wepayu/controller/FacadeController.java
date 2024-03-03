@@ -27,7 +27,6 @@ public class FacadeController {
 
     private EmpregadoController empregadoController;
     private FolhaDePagamentoController folhaDePagamentoController;
-    private boolean systemOn;
 
     public FacadeController() {
         SystemController.setSystemOn(true);
@@ -35,14 +34,16 @@ public class FacadeController {
         EmpregadoXML xmlEmpregado = new EmpregadoXML();
         this.empregadoController.setEmpregados(xmlEmpregado.readEmpregados());
         FolhaDePagamentoXML xmlFolha = new FolhaDePagamentoXML();
+        this.folhaDePagamentoController = new FolhaDePagamentoController(true);
         this.folhaDePagamentoController = xmlFolha.readFolha();
-        this.folhaDePagamentoController = new FolhaDePagamentoController(this.systemOn);
     }
 
     public void zerarSistema() throws Exception {
         SystemController.pushUndo(this.empregadoController);
+
         this.empregadoController = new EmpregadoController();
-        this.folhaDePagamentoController = new FolhaDePagamentoController(this.systemOn);
+        this.folhaDePagamentoController = new FolhaDePagamentoController(true);
+
         Utils.deleteFilesXML();
         Utils.deleteFolhas();
         System.out.println("-> Sistema zerado");
@@ -55,7 +56,6 @@ public class FacadeController {
         xmlEmpregado.save(this.empregadoController.getEmpregados());
         FolhaDePagamentoXML xmlFolha = new FolhaDePagamentoXML();
         xmlFolha.saveFolha(this.folhaDePagamentoController);
-        this.systemOn = false;
         SystemController.setSystemOn(false);
     }
 
@@ -152,32 +152,18 @@ public class FacadeController {
         return "0,00";
     }
 
-    public String getTaxasServico(String emp, String dataInicial, String dataFinal) throws Exception {
+    public String getTaxasServico(String emp, String dataInicial, String dataFinal) {
 
-        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
+        Contexto contexto = new Contexto();
 
-        if (e == null)
-            return "0,00";
+        String taxa = contexto.getTaxasServico(new ContextoEmpregado(), emp, dataInicial, dataFinal,
+                this.empregadoController);
 
-        LocalDate dataInicialFormato = Utils.validData(dataInicial, " inicial ");
-
-        if (dataInicialFormato == null)
-            return "0,00";
-
-        LocalDate dataFinalFormato = Utils.validData(dataFinal, " final ");
-
-        if (dataFinalFormato == null)
-            return "0,00";
-
-        MembroSindicalizado m = Utils.validMembroSindicalizado(e);
-
-        if (m == null) {
-            return "0,00";
+        if (taxa != null) {
+            return taxa;
         }
 
-        double taxa = m.getTaxaServicos(dataInicialFormato, dataFinalFormato);
-
-        return Utils.convertDoubleToString(taxa, 2);
+        return "0,00";
     }
 
     // 3 variaveis

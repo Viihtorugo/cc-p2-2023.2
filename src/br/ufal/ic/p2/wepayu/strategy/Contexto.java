@@ -133,6 +133,18 @@ public class Contexto {
         }
     }
 
+    public String getTaxasServico(StrategyEmpregado strategyEmpregado, String emp,
+                                         String dataInicial, String dataFinal,
+                                         EmpregadoController empregadoController) {
+        try {
+            return strategyEmpregado.getTaxasServico(emp, dataInicial, dataFinal,
+                    empregadoController);
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
     //3 variaveis
     public void alteraEmpregado(StrategyEmpregado strategyEmpregado, String emp, String atributo,
                                 String valor, EmpregadoController empregadoController,
