@@ -1,7 +1,6 @@
 package br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado;
 
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionDataInicialNaoPodeSerPosteriorAaDataFinal;
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
 import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;

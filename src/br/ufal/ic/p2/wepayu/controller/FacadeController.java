@@ -2,26 +2,13 @@ package br.ufal.ic.p2.wepayu.controller;
 
 import br.ufal.ic.p2.wepayu.database.EmpregadoXML;
 import br.ufal.ic.p2.wepayu.database.FolhaDePagamentoXML;
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
-import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
-import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.TaxaServico;
-import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.Banco;
-import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.Correios;
-import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.EmMaos;
-import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.EmpregadoAssalariado;
-import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado.EmpregadoComissionado;
-import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista.EmpregadoHorista;
 import br.ufal.ic.p2.wepayu.strategy.Contexto;
 import br.ufal.ic.p2.wepayu.strategy.empregado.ContextoEmpregado;
 import br.ufal.ic.p2.wepayu.strategy.empregadocomissionado.ContextoEmpregadoComissionado;
 import br.ufal.ic.p2.wepayu.strategy.empregadohorista.ContextoEmpregadoHorista;
 import br.ufal.ic.p2.wepayu.strategy.getatributo.GetAtributo;
 import br.ufal.ic.p2.wepayu.utils.Utils;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FacadeController {
 

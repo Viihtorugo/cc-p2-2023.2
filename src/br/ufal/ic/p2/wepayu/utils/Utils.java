@@ -1,20 +1,11 @@
 package br.ufal.ic.p2.wepayu.utils;
 
-import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionConversao;
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionMetodosDePagamento;
-import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
-import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
-import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.Banco;
-import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
 
 import java.io.File;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.*;
 
 public class Utils {
 
@@ -97,20 +88,6 @@ public class Utils {
         }
 
         return true;
-    }
-
-    public static Map<String, String> sortHashMap(HashMap<String, String> hashMap) {
-
-        List<Map.Entry<String, String>> entryList = new ArrayList<>(hashMap.entrySet());
-
-        entryList.sort(Map.Entry.comparingByValue());
-
-        Map<String, String> sortedMap = new LinkedHashMap<>();
-        for (Map.Entry<String, String> entry : entryList) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-
-        return sortedMap;
     }
 
     public static void deleteFilesXML() {

@@ -45,15 +45,26 @@ public class EmpregadoXML {
 
         HashMap<String, Empregado> empregados = new HashMap<>();
 
-        for (int i = 1; i <= 1000; i++) {
-            String id = Integer.toString(i);
+        File[] folhas = new File("./").listFiles();
 
-            Empregado empregado = read(id + ".xml");
+        for (File f : folhas) {
+            String name = f.getName();
 
-            if (empregado != null) {
-                empregados.put(id, empregado);
+            if (name.endsWith(".xml")) {
+
+                String [] tratamento = name.split("\\.");
+
+                if(tratamento.length == 2) {
+                    if (tratamento[0].matches("\\d+")) {
+
+                        Empregado empregado = read(name);
+
+                        if (empregado != null) {
+                            empregados.put(tratamento[0], empregado);
+                        }
+                    }
+                }
             }
-
         }
 
         return empregados;
