@@ -237,7 +237,7 @@ public class EmpregadoController {
         return copy;
     }
 
-    public HashMap<String, Empregado> novaHashEmpregados() {
+    public HashMap<String, Empregado> copyHashEmpregados() {
 
         if (this.empregados == null)
             return null;

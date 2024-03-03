@@ -29,10 +29,13 @@ public class FacadeController {
     private FolhaDePagamentoController folhaDePagamentoController;
 
     public FacadeController() {
-        SystemController.setSystemOn(true);
+        SystemController.systemStart();
+
+        //Persistencia
         this.empregadoController = new EmpregadoController();
         EmpregadoXML xmlEmpregado = new EmpregadoXML();
         this.empregadoController.setEmpregados(xmlEmpregado.readEmpregados());
+
         FolhaDePagamentoXML xmlFolha = new FolhaDePagamentoXML();
         this.folhaDePagamentoController = new FolhaDePagamentoController(true);
         this.folhaDePagamentoController = xmlFolha.readFolha();
@@ -46,16 +49,21 @@ public class FacadeController {
 
         Utils.deleteFilesXML();
         Utils.deleteFolhas();
+
         System.out.println("-> Sistema zerado");
     }
 
     public void encerrarSistema() {
         System.out.println("-> Sistema encerrado");
 
+        //Salvar no xml
         EmpregadoXML xmlEmpregado = new EmpregadoXML();
         xmlEmpregado.save(this.empregadoController.getEmpregados());
+
         FolhaDePagamentoXML xmlFolha = new FolhaDePagamentoXML();
         xmlFolha.saveFolha(this.folhaDePagamentoController);
+
+        //Encerrar o sistema
         SystemController.setSystemOn(false);
     }
 

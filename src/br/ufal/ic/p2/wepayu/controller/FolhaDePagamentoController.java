@@ -17,12 +17,14 @@ public class FolhaDePagamentoController {
 
     }
 
-    public FolhaDePagamentoController (boolean v) {
-        this.agendaDePagamentoList = new ArrayList<>();
+    public FolhaDePagamentoController (boolean verification) {
+        if (verification) {
+            this.agendaDePagamentoList = new ArrayList<>();
 
-        this.agendaDePagamentoList.add("semanal 5");
-        this.agendaDePagamentoList.add("semanal 2 5");
-        this.agendaDePagamentoList.add("mensal $");
+            this.agendaDePagamentoList.add("semanal 5");
+            this.agendaDePagamentoList.add("semanal 2 5");
+            this.agendaDePagamentoList.add("mensal $");
+        }
     }
 
     public ArrayList<String> getAgendaDePagamentoList() {

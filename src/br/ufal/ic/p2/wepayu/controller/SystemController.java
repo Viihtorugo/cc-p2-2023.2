@@ -10,13 +10,19 @@ public class SystemController {
     private static Stack<HashMap<String, Empregado>> undo;
     private static Stack<HashMap<String, Empregado>> redo;
 
-    private static boolean systemOn = true;
+    private static boolean systemOn;
 
     public static void setSystemOn (boolean systemOn) {
         SystemController.systemOn = systemOn;
     }
 
-    public static void pushUndo(EmpregadoController e) throws Exception {
+    public static void systemStart() {
+        systemOn = true;
+        undo = new Stack<>();
+        redo = new Stack<>();
+    }
+
+    public static void pushUndo(EmpregadoController empregadoController) throws Exception {
 
         if (!systemOn) {
             ExceptionSystem exceptionSystem = new ExceptionSystem();
@@ -24,16 +30,13 @@ public class SystemController {
             return;
         }
 
-        HashMap<String, Empregado> novaHash = e.novaHashEmpregados();
-
-        if (undo == null)
-            undo = new Stack<>();
+        HashMap<String, Empregado> novaHash = empregadoController.copyHashEmpregados();
 
         undo.push(novaHash);
     }
 
     //apenas a lista!
-    public static void pushUndo(HashMap<String, Empregado> e) throws Exception {
+    public static void pushUndo(HashMap<String, Empregado> empregados) throws Exception {
 
         if (!systemOn) {
             ExceptionSystem exceptionSystem = new ExceptionSystem();
@@ -41,10 +44,7 @@ public class SystemController {
             return;
         }
 
-        if (undo == null)
-            undo = new Stack<>();
-
-        undo.push(e);
+        undo.push(empregados);
     }
 
     public static void popUndoErro() throws Exception {
@@ -86,16 +86,14 @@ public class SystemController {
         return e;
     }
 
-    public static void pushRedo(HashMap<String, Empregado> e) throws Exception {
+    public static void pushRedo(HashMap<String, Empregado> empregados) throws Exception {
         if (!systemOn) {
             ExceptionSystem exceptionSystem = new ExceptionSystem();
             exceptionSystem.msgNaoPodeDarComandos();
             return;
         }
 
-        if (redo == null) redo = new Stack<>();
-
-        redo.push(e);
+        redo.push(empregados);
     }
 
     public static HashMap<String, Empregado> popRedo() throws Exception {
@@ -111,11 +109,11 @@ public class SystemController {
             return  null;
         }
 
-        HashMap<String, Empregado> e = redo.peek();
+        HashMap<String, Empregado> empregados = redo.peek();
 
-        SystemController.pushUndo(e);
+        SystemController.pushUndo(empregados);
         redo.pop();
 
-        return e;
+        return empregados;
     }
 }
