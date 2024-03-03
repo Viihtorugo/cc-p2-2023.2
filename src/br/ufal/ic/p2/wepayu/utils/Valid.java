@@ -3,10 +3,14 @@ package br.ufal.ic.p2.wepayu.utils;
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.exceptions.*;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
+import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Valid {
 
@@ -168,6 +172,88 @@ public class Valid {
 
         if (valorFormato <= 0) {
             throw new ExceptionValorDeveSerPositivo();
+        }
+
+        return true;
+    }
+
+    public boolean validAgendaPagamento(String agendaPagamento, ArrayList<String> agendaPagamentoList) {
+        for (String agendaItem: agendaPagamentoList)
+            if (agendaItem.equals(agendaPagamento))
+                return true;
+
+        throw new ExceptionAgendaDePagamentoNaoEstaDisponivel();
+    }
+
+    public boolean validSindicalizado(String valor) {
+        if (valor.equals("true") || valor.equals("false"))
+            return true;
+
+        throw new ExceptionValorDeveSerTrueOuFalse();
+    }
+
+    public boolean validMetodoPagamento(String valor) {
+        if (valor.equals("correios") || valor.equals("emMaos") || valor.equals("banco"))
+            return true;
+
+        throw new ExceptionMetodoDePagamentoInvalido();
+    }
+
+    public boolean validIdSindical(String idSindicato) {
+
+        if (idSindicato.isEmpty()) {
+            throw new ExceptionIdentificacaoDoSindicatoNaoPodeSerNula();
+        }
+
+        return true;
+    }
+
+    public boolean validTaxaSindical(String taxaSindical) {
+
+        if (taxaSindical.isEmpty()) {
+            throw new ExceptionTaxaSindicalNaoPodeSerNula();
+        }
+
+        if (!taxaSindical.matches("[0-9,-]+")) {
+            throw new ExceptionTaxaSindicalDeveSerNumerica();
+        }
+
+        double taxaSindicalNumber = Utils.convertStringToDouble(taxaSindical);
+
+        if (taxaSindicalNumber <= 0.0) {
+            throw new ExceptionTaxaSindicalDeveSerNaoNegativa();
+        }
+
+        return true;
+    }
+
+    public boolean sindicalizarEmpregado(String idSindicato, EmpregadoController empregadoController) {
+
+        HashMap<String, Empregado> empregados = empregadoController.getEmpregados();
+
+        for (Map.Entry<String, Empregado> entry : empregados.entrySet()) {
+            MembroSindicalizado membroSindicalizado = entry.getValue().getSindicalizado();
+
+            if (membroSindicalizado!= null)
+                if (membroSindicalizado.getIdMembro().equals(idSindicato))
+                    throw new ExceptionHaOutroEmpregadoComEstaIdentificacaoDeSindicato();
+        }
+
+        return true;
+    }
+
+    public boolean validBanco (String banco, String agencia, String contaCorrente) {
+
+        if (banco.isEmpty()) {
+            throw new ExceptionBancoNaoPodeSerNulo();
+        }
+
+        if (agencia.isEmpty()) {
+            throw new ExceptionAgenciaNaoPodeSerNulo();
+        }
+
+        if (contaCorrente.isEmpty()) {
+            throw new ExceptionContaCorrenteNaoPodeSerNulo();
         }
 
         return true;

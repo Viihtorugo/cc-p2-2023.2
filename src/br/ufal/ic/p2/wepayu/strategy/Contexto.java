@@ -1,6 +1,7 @@
 package br.ufal.ic.p2.wepayu.strategy;
 
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
+import br.ufal.ic.p2.wepayu.controller.FolhaDePagamentoController;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 import br.ufal.ic.p2.wepayu.strategy.empregado.StrategyEmpregado;
 import br.ufal.ic.p2.wepayu.strategy.empregadocomissionado.StrategyEmpregadoComissionado;
@@ -104,6 +105,53 @@ public class Contexto {
         try {
             return strategyEmpregadoComissionado.getVendasRealizadas(emp, dataInicial, dataFinal,
                     empregadoController);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    //3 variaveis
+    public void alteraEmpregado(StrategyEmpregado strategyEmpregado, String emp, String atributo,
+                                String valor, EmpregadoController empregadoController,
+                                FolhaDePagamentoController folhaDePagamentoController) {
+        try {
+            strategyEmpregado.executeAlteraEmpregado(emp, atributo, valor, empregadoController, folhaDePagamentoController);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    //4 variaveis
+    public void alteraEmpregado(StrategyEmpregado strategyEmpregado, String emp, String atributo,
+                                String valor, String sal, EmpregadoController empregadoController) {
+        try {
+            strategyEmpregado.executeAlteraEmpregado(emp, atributo, valor, sal, empregadoController);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    //5 variaveis
+    public void alteraEmpregado(StrategyEmpregado strategyEmpregado, String emp, String atributo,
+                                String valor, String idSindicato, String taxaSindical,
+                                EmpregadoController empregadoController) {
+
+        try {
+            strategyEmpregado.executeAlteraEmpregado(emp, atributo, valor,
+                    idSindicato, taxaSindical, empregadoController);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    //6 variaveis
+    public void alteraEmpregado(StrategyEmpregado strategyEmpregado, String emp, String atributo,
+                                String tipo, String banco, String agencia, String contaCorrente,
+                                EmpregadoController empregadoController) {
+
+        try {
+            strategyEmpregado.executeAlteraEmpregado(emp, atributo, tipo,
+                    banco, agencia, contaCorrente, empregadoController);
         } catch (Exception e) {
             throw e;
         }

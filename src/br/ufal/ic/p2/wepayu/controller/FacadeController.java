@@ -193,162 +193,33 @@ public class FacadeController {
 
     // 3 variaveis
     public void alteraEmpregado(String emp, String atributo, String valor) throws Exception {
-        SystemController.pushUndo(this.empregadoController);
 
-        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
+        Contexto contexto = new Contexto();
+        contexto.alteraEmpregado(new ContextoEmpregado(), emp, atributo, valor,
+                this.empregadoController, this.folhaDePagamentoController);
 
-        if (e == null)
-            return;
-
-        if (!Utils.validGetAtributo(emp, atributo)) {
-            return;
-        }
-
-        switch (atributo) {
-            case "nome" -> {
-                if (Utils.validNome(valor))
-                    e.setNome(valor);
-            }
-            case "endereco" -> {
-                if (Utils.validEndereco(valor))
-                    e.setEndereco(valor);
-            }
-            case "agendaPagamento" -> {
-                if (Utils.validAgendaPagamento(valor, this.folhaDePagamentoController.getAgendaDePagamentoList()))
-                    e.setAgendaDePagamento(valor);
-            }
-            case "salario" -> {
-                double salario = Utils.validSalario(valor);
-
-                if (salario < 0)
-                    return;
-
-                e.setSalario(salario);
-            }
-            case "sindicalizado" -> {
-                if (Utils.validSindicalizado(valor)) {
-                    e.setSindicalizado(null);
-                }
-            }
-            case "comissao" -> {
-
-                double comissao = Utils.validComissao(valor);
-
-                if (comissao < 0)
-                    return;
-
-                if (!Utils.empregadoIsNotComissionado(e))
-                    return;
-
-                ((EmpregadoComissionado) e).setTaxaDeComissao(comissao);
-            }
-            case "tipo" -> {
-
-                if (Utils.validAlterarTipo(e, valor)) {
-                    return;
-                }
-
-                String nome = e.getNome();
-                String endereco = e.getEndereco();
-                double salario = e.getSalario();
-
-                switch (valor) {
-                    case "horista" ->
-                            this.empregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, "semanal 5", salario));
-                    case "assalariado" ->
-                            this.empregadoController.setValue(emp, new EmpregadoAssalariado(nome, endereco, "mensal $", salario));
-                    case "comissionado" ->
-                            this.empregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, "semanal 2 5", salario, 0));
-                }
-            }
-
-            case "metodoPagamento" -> {
-
-                if (!Utils.validMetodoPagamento(valor))
-                    return;
-
-                if (valor.equals("correios")) e.setMetodoPagamento(new Correios());
-
-                else if (valor.equals("emMaos")) e.setMetodoPagamento(new EmMaos());
-
-            }
-        }
     }
 
     // 4 variaveis
     public void alteraEmpregado(String emp, String atributo, String valor, String sal) throws Exception {
-        SystemController.pushUndo(this.empregadoController);
+        Contexto contexto = new Contexto();
+        contexto.alteraEmpregado(new ContextoEmpregado(), emp, atributo, valor, sal,
+                this.empregadoController);
 
-        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
-
-        if (e == null) {
-            return;
-        }
-
-
-        if (!Utils.validGetAtributo(emp, atributo))
-            return;
-
-        String nome = e.getNome();
-        String endereco = e.getEndereco();
-
-        if (valor.equals("comissionado")) {
-            double salario = e.getSalario();
-            double comissao = Utils.validComissao(sal);
-
-            if (comissao < 0)
-                return;
-
-            this.empregadoController.setValue(emp, new EmpregadoComissionado(nome, endereco, "semanal 2 5", salario, comissao));
-
-        } else if (valor.equals("horista")) {
-            double novoSalario = Utils.validSalario(sal);
-
-            if (novoSalario < 0)
-                return;
-
-            this.empregadoController.setValue(emp, new EmpregadoHorista(nome, endereco, "semanal 5", novoSalario));
-        }
     }
 
     // 5 variaveis
     public void alteraEmpregado(String emp, String atributo, String valor, String idSindicato, String taxaSindical) throws Exception {
-        SystemController.pushUndo(this.empregadoController);
-
-        if (Utils.validIdSindical(idSindicato))
-            return;
-
-        double taxaSindicalNumber = Utils.validTaxaSindical(taxaSindical);
-
-        if (taxaSindicalNumber <= 0.0)
-            return;
-
-        if (atributo.equals("sindicalizado") && valor.equals("true")) {
-
-            if (Utils.sindicalizarEmpregado(idSindicato, this.empregadoController)) {
-                Empregado e = Utils.validEmpregado(emp, this.empregadoController);
-
-                if (e == null) return;
-
-                e.setSindicalizado(new MembroSindicalizado(idSindicato, taxaSindicalNumber));
-            }
-        }
+        Contexto contexto = new Contexto();
+        contexto.alteraEmpregado(new ContextoEmpregado(), emp, atributo, valor,
+                idSindicato, taxaSindical, this.empregadoController);
     }
 
     // 6 variaveis
     public void alteraEmpregado(String emp, String atributo, String tipo, String banco, String agencia, String contaCorrente) throws Exception {
-        SystemController.pushUndo(this.empregadoController);
-
-        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
-
-        if (e == null)
-            return;
-
-        if (!Utils.validGetAtributo(emp, atributo))
-            return;
-
-        if (Utils.validBanco(banco, agencia, contaCorrente))
-            e.setMetodoPagamento(new Banco(banco, agencia, contaCorrente));
+        Contexto contexto = new Contexto();
+        contexto.alteraEmpregado(new ContextoEmpregado(), emp, atributo, tipo,
+                banco, agencia, contaCorrente, this.empregadoController);
     }
 
     public void removerEmpregado(String emp) throws Exception {
