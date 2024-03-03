@@ -12,14 +12,6 @@ public class SystemController {
 
     private static boolean systemOn = true;
 
-    public static void systemOff() {
-        systemOn = false;
-    }
-
-    public static boolean getSystemOn () {
-        return systemOn;
-    }
-
     public static void pushUndo(EmpregadoController e) throws Exception {
 
         if (!systemOn) {

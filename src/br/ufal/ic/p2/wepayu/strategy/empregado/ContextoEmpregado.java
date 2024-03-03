@@ -2,7 +2,7 @@ package br.ufal.ic.p2.wepayu.strategy.empregado;
 
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.controller.SystemController;
-import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionNaoHaEmpregadoComEsseNome;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.EmpregadoAssalariado;
 import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado.EmpregadoComissionado;
@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ContextoEmpregado implements StrategyCriarEmpregado, StrategyRemoverEmpregado {
+public class ContextoEmpregado implements StrategyEmpregado {
     private Valid verification;
 
     public ContextoEmpregado () {
@@ -70,29 +70,25 @@ public class ContextoEmpregado implements StrategyCriarEmpregado, StrategyRemove
         return null;
     }
 
-//    public String getEmpregadoPorNome(String nome, int indice) throws Exception {
-//
-//        int count = 0;
-//
-//        HashMap<String, Empregado> empregados = this.empregadoController.getEmpregados();
-//
-//        for (Map.Entry<String, Empregado> entry : empregados.entrySet()) {
-//
-//            Empregado e = entry.getValue();
-//
-//            if (nome.contains(e.getNome()))
-//                count++;
-//
-//            if (count == indice)
-//                return entry.getKey();
-//        }
-//
-//        ExceptionEmpregado ex = new ExceptionEmpregado();
-//
-//        ex.msgEmpregadoNaoExistePorNome();
-//
-//        return null;
-//    }
+    public String getEmpregadoPorNome(String nome, int indice, EmpregadoController empregadoController) {
+
+        int count = 0;
+
+        HashMap<String, Empregado> empregados = empregadoController.getEmpregados();
+
+        for (Map.Entry<String, Empregado> entry : empregados.entrySet()) {
+
+            Empregado e = entry.getValue();
+
+            if (nome.contains(e.getNome()))
+                count++;
+
+            if (count == indice)
+                return entry.getKey();
+        }
+
+        throw new ExceptionNaoHaEmpregadoComEsseNome();
+    }
 
     @Override
     public void executeRemoveEmpregado(String emp, EmpregadoController empregadoController) {

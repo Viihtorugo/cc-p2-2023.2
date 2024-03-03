@@ -3,11 +3,13 @@ package br.ufal.ic.p2.wepayu.strategy.empregado;
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 
-public interface StrategyCriarEmpregado {
+public interface StrategyEmpregado {
 
     Empregado executeCriarEmpregado(String nome, String endereco, String tipo, String salario,
-                                    EmpregadoController empregadoController) throws Exception;
+                                    EmpregadoController empregadoController);
     Empregado executeCriarEmpregado(String nome, String endereco, String tipo, String salario,
                                     String comissao, EmpregadoController empregadoController);
-
+    void executeRemoveEmpregado(String emp, EmpregadoController empregadoController);
+    String getEmpregadoPorNome(String nome, int indice,
+                                      EmpregadoController empregadoController);
 }

@@ -14,6 +14,7 @@ import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissio
 import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista.EmpregadoHorista;
 import br.ufal.ic.p2.wepayu.strategy.Contexto;
 import br.ufal.ic.p2.wepayu.strategy.empregado.ContextoEmpregado;
+import br.ufal.ic.p2.wepayu.strategy.empregadocomissionado.ContextoEmpregadoComissionado;
 import br.ufal.ic.p2.wepayu.strategy.empregadohorista.ContextoEmpregadoHorista;
 import br.ufal.ic.p2.wepayu.strategy.getatributo.GetAtributo;
 import br.ufal.ic.p2.wepayu.utils.Utils;
@@ -85,26 +86,10 @@ public class FacadeController {
         contexto.lancaCartao(new ContextoEmpregadoHorista(), emp, data, horas, this.empregadoController);
     }
 
-    public void lancaVenda(String emp, String data, String valor) throws Exception {
+    public void lancaVenda(String emp, String data, String valor) {
 
-        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
-
-        if (e == null) {
-            return;
-        }
-
-        if (Utils.validTipoEmpregado(e, "comissionado")) {
-            double valorFormato = Utils.validValor(valor);
-            LocalDate dataFormato = Utils.validData(data, " ");
-
-            if (valorFormato <= 0 || dataFormato == null) {
-                return;
-            }
-
-            SystemController.pushUndo(this.empregadoController);
-            ((EmpregadoComissionado) e).addVenda(data, valorFormato);
-        }
-
+        Contexto contexto = new Contexto();
+        contexto.lancaVenda(new ContextoEmpregadoComissionado(), emp, data, valor, this.empregadoController);
     }
 
     public void lancaTaxaServico(String membro, String data, String valor) throws Exception {
@@ -124,38 +109,22 @@ public class FacadeController {
         this.empregadoController.getEmpregado(id).addTaxaServico(new TaxaServico(data, valorFormato));
     }
 
-    public String getEmpregadoPorNome(String nome, int indice) throws Exception {
+    public String getEmpregadoPorNome(String nome, int indice) {
 
-        int count = 0;
+        Contexto contexto = new Contexto();
+        String id = contexto.getEmpregadoPorNome(new ContextoEmpregado(), nome, indice, this.empregadoController);
 
-        HashMap<String, Empregado> empregados = this.empregadoController.getEmpregados();
-
-        for (Map.Entry<String, Empregado> entry : empregados.entrySet()) {
-
-            Empregado e = entry.getValue();
-
-            if (nome.contains(e.getNome()))
-                count++;
-
-            if (count == indice)
-                return entry.getKey();
-        }
-
-        ExceptionEmpregado ex = new ExceptionEmpregado();
-
-        ex.msgEmpregadoNaoExistePorNome();
-
-        return null;
+        return id;
     }
 
-    public String getAtributoEmpregado(String emp, String atributo) throws Exception {
+    public String getAtributoEmpregado(String emp, String atributo) {
 
         Contexto contexto = new Contexto();
 
         return contexto.getAtributo(new GetAtributo(), emp, atributo, this.empregadoController);
     }
 
-    public String getHorasNormaisTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception {
+    public String getHorasNormaisTrabalhadas(String emp, String dataInicial, String dataFinal) {
 
         Contexto contexto = new Contexto();
 
@@ -169,7 +138,7 @@ public class FacadeController {
         return "0";
     }
 
-    public String getHorasExtrasTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception {
+    public String getHorasExtrasTrabalhadas(String emp, String dataInicial, String dataFinal){
         Contexto contexto = new Contexto();
 
         String horas = contexto.getHorasExtrasTrabalhadas(new ContextoEmpregadoHorista(),
@@ -183,26 +152,13 @@ public class FacadeController {
     }
 
     public String getVendasRealizadas(String emp, String dataInicial, String dataFinal) throws Exception {
-        Empregado e = Utils.validEmpregado(emp, this.empregadoController);
 
-        if (e == null) return null;
+        Contexto contexto = new Contexto();
+        String vendasRealizadas = contexto.getVendasRealizadas(new ContextoEmpregadoComissionado(), emp,
+                dataInicial, dataFinal, this.empregadoController);
 
-        if (Utils.validTipoEmpregado(e, "comissionado")) {
-
-            LocalDate dataInicialFormato = Utils.validData(dataInicial, " inicial ");
-
-            if (dataInicialFormato == null)
-                return "0,00";
-
-            LocalDate dataFinalFormato = Utils.validData(dataFinal, " final ");
-
-            if (dataFinalFormato == null)
-                return "0,00";
-
-            double vendas = ((EmpregadoComissionado) e).getVendasRealizadas(dataInicialFormato, dataFinalFormato);
-
-            return Utils.convertDoubleToString(vendas, 2);
-        }
+        if (vendasRealizadas != null)
+            return vendasRealizadas;
 
         return "0,00";
     }

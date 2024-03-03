@@ -153,4 +153,23 @@ public class Valid {
 
         return true;
     }
+
+    public boolean validValor(String valor){
+
+        if (valor.isEmpty()) {
+            throw new ExceptionValorNaoPodeSerNulo();
+        }
+
+        if (!valor.matches("[0-9,-]+")) {
+            throw new ExceptionValorDeveSerNumerico();
+        }
+
+        double valorFormato = Utils.convertStringToDouble(valor);
+
+        if (valorFormato <= 0) {
+            throw new ExceptionValorDeveSerPositivo();
+        }
+
+        return true;
+    }
 }

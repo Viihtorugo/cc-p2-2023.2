@@ -1,5 +1,6 @@
 package br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado;
 
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionDataInicialNaoPodeSerPosteriorAaDataFinal;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
 import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
@@ -38,7 +39,7 @@ public class EmpregadoComissionado extends Empregado {
         this.vendas.add(new CartaoDeVenda(data, valor));
     }
 
-    public double getVendasRealizadas(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
+    public double getVendasRealizadas(LocalDate dataInicial, LocalDate dataFinal) {
 
         double vendasRealizadas = 0;
 
@@ -46,15 +47,12 @@ public class EmpregadoComissionado extends Empregado {
             return vendasRealizadas;
 
         if (dataInicial.isAfter(dataFinal)) {
-            ExceptionEmpregado e = new ExceptionEmpregado();
-            e.msgDataInicialPosteriorDataFinal();
-
-            return vendasRealizadas;
+            throw new ExceptionDataInicialNaoPodeSerPosteriorAaDataFinal();
         }
 
         for (CartaoDeVenda c : this.vendas) {
 
-            LocalDate dataFormato = Utils.validData(c.getData(), "");
+            LocalDate dataFormato = Utils.convertStringToLocalDate(c.getData());
 
             if (dataFormato != null) {
                 if (dataFormato.isEqual(dataInicial) ||

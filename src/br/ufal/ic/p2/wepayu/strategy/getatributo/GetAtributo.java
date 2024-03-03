@@ -12,6 +12,12 @@ import br.ufal.ic.p2.wepayu.utils.Utils;
 
 public class GetAtributo implements StrategyGetAtributo {
 
+    private Valid verification;
+
+    public GetAtributo() {
+        this.verification = new Valid();
+    }
+
     private String getAtributoEmpregado(Empregado emp, String atributo){
 
         switch (atributo) {
@@ -89,10 +95,8 @@ public class GetAtributo implements StrategyGetAtributo {
     @Override
     public String executeGetAtributo(String emp, String atributo, EmpregadoController empregadoController) {
 
-        Valid verification = new Valid();
-
-        if (verification.validEmpregado(emp, empregadoController)) {
-            if (verification.validGetAtributo(atributo)) {
+        if (this.verification.validEmpregado(emp, empregadoController)) {
+            if (this.verification.validGetAtributo(atributo)) {
 
                 Empregado e = empregadoController.getEmpregado(emp);
 
