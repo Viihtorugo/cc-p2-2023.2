@@ -30,7 +30,7 @@ public class FacadeController {
     private boolean systemOn;
 
     public FacadeController() {
-        this.systemOn = true;
+        SystemController.setSystemOn(true);
         this.empregadoController = new EmpregadoController();
         EmpregadoXML xmlEmpregado = new EmpregadoXML();
         this.empregadoController.setEmpregados(xmlEmpregado.readEmpregados());
@@ -56,10 +56,11 @@ public class FacadeController {
         FolhaDePagamentoXML xmlFolha = new FolhaDePagamentoXML();
         xmlFolha.saveFolha(this.folhaDePagamentoController);
         this.systemOn = false;
+        SystemController.setSystemOn(false);
     }
 
     //4 variaveis
-    public String criarEmpregado(String nome, String endereco, String tipo, String salario) {
+    public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws Exception {
 
         Contexto contexto = new Contexto();
 
@@ -68,7 +69,7 @@ public class FacadeController {
     }
 
     //5 variaveis - Empregado Comissionado
-    public String criarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) {
+    public String criarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) throws Exception {
 
         Contexto contexto = new Contexto();
 
@@ -78,19 +79,19 @@ public class FacadeController {
         return this.empregadoController.setEmpregado(emp);
     }
 
-    public void lancaCartao(String emp, String data, String horas) {
+    public void lancaCartao(String emp, String data, String horas) throws Exception {
 
         Contexto contexto = new Contexto();
         contexto.lancaCartao(new ContextoEmpregadoHorista(), emp, data, horas, this.empregadoController);
     }
 
-    public void lancaVenda(String emp, String data, String valor) {
+    public void lancaVenda(String emp, String data, String valor) throws Exception {
 
         Contexto contexto = new Contexto();
         contexto.lancaVenda(new ContextoEmpregadoComissionado(), emp, data, valor, this.empregadoController);
     }
 
-    public void lancaTaxaServico(String membro, String data, String valor) {
+    public void lancaTaxaServico(String membro, String data, String valor) throws Exception {
 
         Contexto contexto = new Contexto();
         contexto.lancaoTaxaDeServico(new ContextoEmpregado(), membro, data, valor,
@@ -225,7 +226,6 @@ public class FacadeController {
     }
 
     public String getNumeroDeEmpregados() {
-
         int n = this.empregadoController.getNumeroDeEmpregados();
 
         return Integer.toString(n);

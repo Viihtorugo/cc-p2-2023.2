@@ -12,6 +12,10 @@ public class SystemController {
 
     private static boolean systemOn = true;
 
+    public static void setSystemOn (boolean systemOn) {
+        SystemController.systemOn = systemOn;
+    }
+
     public static void pushUndo(EmpregadoController e) throws Exception {
 
         if (!systemOn) {
@@ -41,6 +45,23 @@ public class SystemController {
             undo = new Stack<>();
 
         undo.push(e);
+    }
+
+    public static void popUndoErro() throws Exception {
+
+        if (!systemOn) {
+            ExceptionSystem exceptionSystem = new ExceptionSystem();
+            exceptionSystem.msgNaoPodeDarComandos();
+            return;
+        }
+
+        if (undo.empty()) {
+            ExceptionSystem exceptionSystem = new ExceptionSystem();
+            exceptionSystem.msgNaoHaComandoDesfazer();
+            return;
+        }
+
+        undo.pop();
     }
 
     public static HashMap<String, Empregado> popUndo() throws Exception {

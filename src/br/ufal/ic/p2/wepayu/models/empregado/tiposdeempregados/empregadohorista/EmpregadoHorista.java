@@ -120,7 +120,7 @@ public class EmpregadoHorista extends Empregado {
         return "horista";
     }
 
-    public double getSalarioBruto(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
+    public double getSalarioBruto(LocalDate dataInicial, LocalDate dataFinal) {
         double valorHorasNormais = this.getHorasNormaisTrabalhadas(dataInicial, dataFinal) * this.salarioPorHora;
         double valorHorasExtras = 1.5 * this.getHorasExtrasTrabalhadas(dataInicial, dataFinal) * this.salarioPorHora;
 

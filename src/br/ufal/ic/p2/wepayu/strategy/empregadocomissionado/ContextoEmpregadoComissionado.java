@@ -56,12 +56,6 @@ public class ContextoEmpregadoComissionado implements StrategyEmpregadoComission
 
                         double valorFormato = Utils.convertStringToDouble(valor);
 
-                        try {
-                            SystemController.pushUndo(empregadoController);
-                        } catch (Exception e) {
-                            System.out.println("Deu Errado!");
-                        }
-
                         ((EmpregadoComissionado) empregado).addVenda(data, valorFormato);
                     }
                 }

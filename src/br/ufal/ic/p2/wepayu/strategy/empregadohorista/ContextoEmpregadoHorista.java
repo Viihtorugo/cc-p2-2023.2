@@ -66,12 +66,6 @@ public class ContextoEmpregadoHorista implements StrategyEmpregadoHorista {
 
                         double horasFormato = Utils.convertStringToDouble(horas);
 
-                        try {
-                            SystemController.pushUndo(empregadoController);
-                        } catch (Exception e) {
-                            throw new RuntimeException("Deu errado!");
-                        }
-
                         ((EmpregadoHorista) empregado).addRegistro(data, horasFormato);
                     }
                 }

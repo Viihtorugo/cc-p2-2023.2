@@ -104,16 +104,33 @@ public class EmpregadoComissionado extends Empregado {
         return this.vendas;
     }
 
-    public double getSalarioBruto(LocalDate dataInicial, LocalDate dataCriacao) throws Exception {
-        double comissao = this.getVendasRealizadas(dataInicial, dataCriacao) * this.taxaDeComissao;
-        comissao = Math.floor(comissao*100)/100F;
+    public double getSalarioBruto(LocalDate dataInicial, LocalDate dataCriacao) {
 
-        double salarioFixo = getSalario();
+        double salarioFixo = 0;
+        double comissao = 0;
 
-        if (super.getAgendaDePagamento().equals("semanal 2 5")) {
-            salarioFixo = Math.floor((salarioFixo*12D/52D)*2D * 100)/100F;
-        } else if (super.getAgendaDePagamento().equals("semanal 5")) {
-            salarioFixo = Math.floor((salarioFixo*12D/52D) * 100)/100F;
+        String [] pagamento = super.getAgendaDePagamento().split(" ");
+
+        if (pagamento[0].equals("semanal")) {
+            if (pagamento.length == 3) {
+                int week = Integer.parseInt(pagamento[1]);
+
+                salarioFixo = Math.floor((this.salarioMensal * 12D / 52D) * week * 100) / 100F;
+
+                comissao = this.getVendasRealizadas(dataInicial, dataCriacao) * this.taxaDeComissao;
+                comissao = Math.floor(comissao*100)/100F;
+
+            } else {
+                comissao = this.getVendasRealizadas(dataInicial, dataCriacao) * this.taxaDeComissao;
+                comissao = Math.floor(comissao*100)/100F;
+
+                salarioFixo = Math.floor((this.salarioMensal*12D/52D) * 100)/100F;
+            }
+        } else {
+            comissao = this.getVendasRealizadas(dataInicial, dataCriacao) * this.taxaDeComissao;
+            comissao = Math.floor(comissao*100)/100F;
+
+            salarioFixo = this.salarioMensal;
         }
 
         return comissao + salarioFixo;

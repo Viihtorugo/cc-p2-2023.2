@@ -36,12 +36,6 @@ public class ContextoEmpregado implements StrategyEmpregado {
         if (this.verification.validNome(nome) && this.verification.validEndereco(endereco)
                 && this.verification.validTipoNaoComissionado(tipo) && this.verification.validSalario(salario)) {
 
-            try {
-                SystemController.pushUndo(empregadoController);
-            } catch (Exception e) {
-                throw new RuntimeException("Deu errado!");
-            }
-
             double salarioFormatado = Utils.convertStringToDouble(salario);
 
             if (tipo.equals("assalariado")) {
@@ -63,16 +57,11 @@ public class ContextoEmpregado implements StrategyEmpregado {
                 this.verification.validTipoComissionado(tipo) && this.verification.validSalario(salario)
                 && this.verification.validComissao(comissao)) {
 
-            try {
-                SystemController.pushUndo(empregadoController);
-            } catch (Exception e) {
-                throw new RuntimeException("Deu errado!");
-            }
 
             double salarioFormatado = Utils.convertStringToDouble(salario);
             double comissaoFormatado = Utils.convertStringToDouble(comissao);
 
-            return new EmpregadoComissionado(nome, endereco, "semanal 5 2", salarioFormatado, comissaoFormatado);
+            return new EmpregadoComissionado(nome, endereco, "semanal 2 5", salarioFormatado, comissaoFormatado);
         }
 
         return null;
@@ -103,12 +92,6 @@ public class ContextoEmpregado implements StrategyEmpregado {
 
         if (this.verification.validEmpregado(emp, empregadoController)) {
 
-            try {
-                SystemController.pushUndo(empregadoController);
-            } catch (Exception e) {
-                throw new RuntimeException("Deu errado!");
-            }
-
             File file = new File(emp + ".xml");
 
             if (file.exists()) {
@@ -126,6 +109,7 @@ public class ContextoEmpregado implements StrategyEmpregado {
         if (this.verification.validMembroSindicalizadoPeloID(membro, empregadoController)) {
             if (this.verification.validValor(valor)) {
                 if (this.verification.validData(data, " ")) {
+
                     String id = empregadoController.getEmpregadoPorIdSindical(membro);
 
                     double valorFormato = Utils.convertStringToDouble(valor);
