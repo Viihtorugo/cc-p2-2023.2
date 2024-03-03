@@ -39,7 +39,7 @@ public class GetAtributo implements StrategyGetAtributo {
             }
             case "comissao" -> {
 
-                if (emp.getTipo().equals("comissionado"))
+                if (this.verification.validTipoEmpregado(emp, "comissionado"))
                     return Utils.convertDoubleToString(((EmpregadoComissionado) emp).getTaxaDeComissao(), 2);
 
                 return null;
@@ -58,13 +58,14 @@ public class GetAtributo implements StrategyGetAtributo {
             case "banco", "agencia", "contaCorrente" -> {
                 MetodoPagamento metodoPagamento = emp.getMetodoPagamento();
 
-                if (!metodoPagamento.getMetodoPagamento().equals("banco"))
-                    return null;
+                if (this.verification.validBanco(metodoPagamento))
+                {
+                    if (atributo.equals("banco")) return ((Banco) metodoPagamento).getBanco();
+                    if (atributo.equals("agencia")) return ((Banco) metodoPagamento).getAgencia();
 
-                if (atributo.equals("banco")) return ((Banco) metodoPagamento).getBanco();
-                if (atributo.equals("agencia")) return ((Banco) metodoPagamento).getAgencia();
+                    return ((Banco) metodoPagamento).getContaCorrente();
+                }
 
-                return ((Banco) metodoPagamento).getContaCorrente();
             }
 
             case "sindicalizado" -> {

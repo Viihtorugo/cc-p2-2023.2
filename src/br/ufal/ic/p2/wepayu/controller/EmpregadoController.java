@@ -48,10 +48,6 @@ public class EmpregadoController {
         this.key = key;
     }
 
-    public int getKey() {
-        return key;
-    }
-
     public String setEmpregado(Empregado e) {
         if (e != null) {
             this.key++;

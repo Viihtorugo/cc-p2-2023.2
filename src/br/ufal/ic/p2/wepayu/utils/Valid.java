@@ -4,6 +4,7 @@ import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.exceptions.*;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
+import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -105,16 +106,28 @@ public class Valid {
         }
     }
 
-    public boolean validTipoEmpregado(Empregado e, String tipo) {
+    public boolean validTipoEmpregado(Empregado empregado, String tipo) {
 
         if (tipo.equals("comissionado") || tipo.equals("assalariado") || tipo.equals("horista")) {
 
-            if (e.getTipo().equals(tipo)) {
+            if (empregado.getTipo().equals(tipo)) {
                 return true;
             } else {
                 throw new ExceptionEmpregadoNaoEhTipo(tipo);
             }
 
+        }
+
+        throw new ExceptionTipoInvalido();
+    }
+
+    public boolean validAlterarTipoEmpregado(Empregado empregado, String tipo) {
+        if (tipo.equals("comissionado") || tipo.equals("assalariado") || tipo.equals("horista")) {
+            if (empregado.getTipo().equals(tipo)) {
+                return false;
+            } else {
+                return true;
+            }
         }
 
         throw new ExceptionTipoInvalido();
@@ -158,7 +171,7 @@ public class Valid {
         return true;
     }
 
-    public boolean validValor(String valor){
+    public boolean validValor(String valor) {
 
         if (valor.isEmpty()) {
             throw new ExceptionValorNaoPodeSerNulo();
@@ -178,7 +191,7 @@ public class Valid {
     }
 
     public boolean validAgendaPagamento(String agendaPagamento, ArrayList<String> agendaPagamentoList) {
-        for (String agendaItem: agendaPagamentoList)
+        for (String agendaItem : agendaPagamentoList)
             if (agendaItem.equals(agendaPagamento))
                 return true;
 
@@ -204,6 +217,20 @@ public class Valid {
         if (idSindicato.isEmpty()) {
             throw new ExceptionIdentificacaoDoSindicatoNaoPodeSerNula();
         }
+
+        return true;
+    }
+
+    public boolean validMembroSindicalizadoPeloID(String membro, EmpregadoController empregadoController) {
+
+        if (membro.isEmpty())
+            throw new ExceptionIdentificacaoDoMembroNaoPodeSerNula();
+
+
+        String id = empregadoController.getEmpregadoPorIdSindical(membro);
+
+        if (id == null)
+            throw new ExceptionMembroNaoExiste();
 
         return true;
     }
@@ -234,7 +261,7 @@ public class Valid {
         for (Map.Entry<String, Empregado> entry : empregados.entrySet()) {
             MembroSindicalizado membroSindicalizado = entry.getValue().getSindicalizado();
 
-            if (membroSindicalizado!= null)
+            if (membroSindicalizado != null)
                 if (membroSindicalizado.getIdMembro().equals(idSindicato))
                     throw new ExceptionHaOutroEmpregadoComEstaIdentificacaoDeSindicato();
         }
@@ -242,7 +269,7 @@ public class Valid {
         return true;
     }
 
-    public boolean validBanco (String banco, String agencia, String contaCorrente) {
+    public boolean validBanco(String banco, String agencia, String contaCorrente) {
 
         if (banco.isEmpty()) {
             throw new ExceptionBancoNaoPodeSerNulo();
@@ -257,5 +284,12 @@ public class Valid {
         }
 
         return true;
+    }
+
+    public boolean validBanco(MetodoPagamento metodo) {
+        if (metodo.getMetodoPagamento().equals("banco"))
+            return true;
+
+        throw new ExceptionEmpregadoNaoRecebeEmBanco();
     }
 }

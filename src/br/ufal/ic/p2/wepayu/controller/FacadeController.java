@@ -59,19 +59,16 @@ public class FacadeController {
     }
 
     //4 variaveis
-    public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws Exception {
-        SystemController.pushUndo(this.empregadoController);
+    public String criarEmpregado(String nome, String endereco, String tipo, String salario) {
 
         Contexto contexto = new Contexto();
 
         Empregado emp = contexto.criarEmpregado(new ContextoEmpregado(), nome, endereco, tipo, salario, empregadoController);
-
         return this.empregadoController.setEmpregado(emp);
     }
 
     //5 variaveis - Empregado Comissionado
-    public String criarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) throws Exception {
-        SystemController.pushUndo(this.empregadoController);
+    public String criarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) {
 
         Contexto contexto = new Contexto();
 
@@ -81,7 +78,8 @@ public class FacadeController {
         return this.empregadoController.setEmpregado(emp);
     }
 
-    public void lancaCartao(String emp, String data, String horas) throws Exception {
+    public void lancaCartao(String emp, String data, String horas) {
+
         Contexto contexto = new Contexto();
         contexto.lancaCartao(new ContextoEmpregadoHorista(), emp, data, horas, this.empregadoController);
     }
@@ -92,21 +90,11 @@ public class FacadeController {
         contexto.lancaVenda(new ContextoEmpregadoComissionado(), emp, data, valor, this.empregadoController);
     }
 
-    public void lancaTaxaServico(String membro, String data, String valor) throws Exception {
-        SystemController.pushUndo(this.empregadoController);
+    public void lancaTaxaServico(String membro, String data, String valor) {
 
-        String id = Utils.validMembroSindicalizadoPeloID(membro, this.empregadoController);
-
-        if (id == null)
-            return;
-
-        double valorFormato = Utils.validValor(valor);
-        LocalDate dataFormato = Utils.validData(data, " ");
-
-        if (valorFormato <= 0 || dataFormato == null)
-            return;
-
-        this.empregadoController.getEmpregado(id).addTaxaServico(new TaxaServico(data, valorFormato));
+        Contexto contexto = new Contexto();
+        contexto.lancaoTaxaDeServico(new ContextoEmpregado(), membro, data, valor,
+                this.empregadoController);
     }
 
     public String getEmpregadoPorNome(String nome, int indice) {

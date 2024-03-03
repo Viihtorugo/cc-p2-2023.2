@@ -99,6 +99,16 @@ public class Contexto {
         }
     }
 
+    public void lancaoTaxaDeServico(StrategyEmpregado strategyEmpregado,
+                                    String membro, String data, String valor,
+                                    EmpregadoController empregadoController) {
+        try {
+            strategyEmpregado.executeLancaTaxaServico(membro, data, valor, empregadoController);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     public String getVendasRealizadas(StrategyEmpregadoComissionado strategyEmpregadoComissionado,
                                       String emp, String dataInicial, String dataFinal,
                                       EmpregadoController empregadoController) {

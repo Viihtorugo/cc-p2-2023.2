@@ -13,6 +13,8 @@ public interface StrategyEmpregado {
     void executeRemoveEmpregado(String emp, EmpregadoController empregadoController);
     String getEmpregadoPorNome(String nome, int indice,
                                       EmpregadoController empregadoController);
+    void executeLancaTaxaServico(String membro, String data, String valor,
+                                 EmpregadoController empregadoController);
     void executeAlteraEmpregado(String emp, String atributo, String valor,
                                 EmpregadoController empregadoController,
                                 FolhaDePagamentoController folhaDePagamentoController);
