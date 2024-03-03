@@ -7,34 +7,10 @@ import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicali
 import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
 import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.tiposdemetodopagamento.Banco;
 import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado.EmpregadoComissionado;
+import br.ufal.ic.p2.wepayu.utils.Valid;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
 public class GetAtributo implements StrategyGetAtributo {
-
-    private boolean validEmpregado(String emp, EmpregadoController empregadoController) {
-
-        if (emp.isEmpty())
-            throw new ExceptionIdentificacaoDoEmpregadoNaoPodeSerNula();
-
-        if (empregadoController.getEmpregado(emp) == null)
-            throw new ExceptionEmpregadoNaoExiste();
-
-        return true;
-    }
-
-    private boolean validGetAtributo(String atributo) {
-        switch (atributo) {
-            case "nome", "tipo", "salario", "endereco",
-                    "comissao", "metodoPagamento", "banco",
-                    "agencia", "contaCorrente", "sindicalizado",
-                    "idSindicato", "taxaSindical", "agendaPagamento" -> {
-                return true;
-            }
-            default -> {
-                throw new ExceptionAtributoNaoExiste();
-            }
-        }
-    }
 
     private String getAtributoEmpregado(Empregado emp, String atributo){
 
@@ -112,8 +88,11 @@ public class GetAtributo implements StrategyGetAtributo {
 
     @Override
     public String executeGetAtributo(String emp, String atributo, EmpregadoController empregadoController) {
-        if (validEmpregado(emp, empregadoController)) {
-            if (validGetAtributo(atributo)) {
+
+        Valid verification = new Valid();
+
+        if (verification.validEmpregado(emp, empregadoController)) {
+            if (verification.validGetAtributo(atributo)) {
 
                 Empregado e = empregadoController.getEmpregado(emp);
 

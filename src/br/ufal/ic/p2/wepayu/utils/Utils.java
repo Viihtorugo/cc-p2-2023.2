@@ -649,4 +649,9 @@ public class Utils {
 
         return value + padChar.repeat(padLength);
     }
+
+    public static LocalDate convertStringToLocalDate(String data) {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("d/M/yyyy");
+        return LocalDate.parse(data, formato);
+    }
 }

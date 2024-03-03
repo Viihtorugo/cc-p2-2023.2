@@ -1,4 +1,4 @@
-package br.ufal.ic.p2.wepayu.strategy.criarempregado;
+package br.ufal.ic.p2.wepayu.strategy.empregado;
 
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;

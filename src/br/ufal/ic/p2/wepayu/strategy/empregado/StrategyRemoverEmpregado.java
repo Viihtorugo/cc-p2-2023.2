@@ -1,4 +1,4 @@
-package br.ufal.ic.p2.wepayu.strategy.removerempregado;
+package br.ufal.ic.p2.wepayu.strategy.empregado;
 
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 

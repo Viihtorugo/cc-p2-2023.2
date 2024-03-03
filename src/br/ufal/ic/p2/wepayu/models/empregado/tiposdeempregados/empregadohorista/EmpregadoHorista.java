@@ -1,7 +1,9 @@
 package br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista;
 
+import br.ufal.ic.p2.wepayu.exceptions.ExceptionDataInicialNaoPodeSerPosteriorAaDataFinal;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionEmpregado;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
+import br.ufal.ic.p2.wepayu.utils.Valid;
 import br.ufal.ic.p2.wepayu.utils.Utils;
 
 import java.time.LocalDate;
@@ -38,7 +40,7 @@ public class EmpregadoHorista extends Empregado {
         this.cartao.add(new CartaoDePonto(data, horas));
     }
 
-    public double getHorasNormaisTrabalhadas(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
+    public double getHorasNormaisTrabalhadas(LocalDate dataInicial, LocalDate dataFinal) {
 
         double horasAcumuladas = 0;
 
@@ -46,15 +48,12 @@ public class EmpregadoHorista extends Empregado {
             return horasAcumuladas;
 
         if (dataInicial.isAfter(dataFinal)) {
-            ExceptionEmpregado e = new ExceptionEmpregado();
-            e.msgDataInicialPosteriorDataFinal();
-
-            return horasAcumuladas;
+            throw new ExceptionDataInicialNaoPodeSerPosteriorAaDataFinal();
         }
 
         for (CartaoDePonto c : cartao) {
 
-            LocalDate dataFormato = Utils.validData(c.getData(), "");
+            LocalDate dataFormato = Utils.convertStringToLocalDate(c.getData());
 
             if (dataFormato != null) {
                 if (dataFormato.isEqual(dataInicial) ||
@@ -73,19 +72,16 @@ public class EmpregadoHorista extends Empregado {
         return horasAcumuladas;
     }
 
-    public double getHorasExtrasTrabalhadas(LocalDate dataInicial, LocalDate dataFinal) throws Exception {
+    public double getHorasExtrasTrabalhadas(LocalDate dataInicial, LocalDate dataFinal) {
         double horasAcumuladas = 0;
 
         if (dataInicial.isAfter(dataFinal)) {
-            ExceptionEmpregado e = new ExceptionEmpregado();
-            e.msgDataInicialPosteriorDataFinal();
-
-            return horasAcumuladas;
+            throw new ExceptionDataInicialNaoPodeSerPosteriorAaDataFinal();
         }
 
         for (CartaoDePonto c : cartao) {
 
-            LocalDate dataFormato = Utils.validData(c.getData(), "");
+            LocalDate dataFormato = Utils.convertStringToLocalDate(c.getData());
 
             if (dataFormato != null) {
                 if (dataFormato.isEqual(dataInicial) ||
