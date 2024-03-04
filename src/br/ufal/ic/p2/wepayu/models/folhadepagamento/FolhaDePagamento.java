@@ -21,7 +21,6 @@ public class FolhaDePagamento {
     private LocalDate dataCriacao;
     private String arquivoSaida;
 
-
     public FolhaDePagamento(LocalDate dataCriacao, String arquivoSaida) {
         this.dataCriacao = dataCriacao;
         this.arquivoSaida = arquivoSaida;
@@ -34,7 +33,6 @@ public class FolhaDePagamento {
     public void setArquivoSaida(String arquivoSaida) {
         this.arquivoSaida = arquivoSaida;
     }
-
 
     public void geraFolha(EmpregadoController empregadoController) throws Exception {
         if (this.arquivoSaida.isEmpty()) throw new Exception("Arquivo de saída não especificado");
@@ -86,45 +84,38 @@ public class FolhaDePagamento {
         HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(empregadoController.getEmpregadoAssalariado());
         LocalDate dataInicial = dataCriacao.minusDays(dataCriacao.lengthOfMonth() - 1);
 
-        if (dataCriacao.getDayOfMonth() != dataCriacao.lengthOfMonth()) {
-            escritor.write("\n");
-            String footer = Utils.padRight("TOTAL ASSALARIADOS", 48);
-            footer += Utils.padLeft(Utils.convertDoubleToString(totalSalarioBruto, 2), 14);
-            footer += Utils.padLeft(Utils.convertDoubleToString(totalDescontos, 2), 10);
-            footer += Utils.padLeft(Utils.convertDoubleToString(totalSalarioLiquido, 2), 16) + "\n";
-            escritor.write(footer);
-
-            return totalSalarioBruto;
-        }
-
         for (Map.Entry<String, String> entry : empregados.entrySet()) {
             EmpregadoAssalariado e = (EmpregadoAssalariado) empregadoController.getEmpregado(entry.getKey());
 
-            String nome = e.getNome();
-            double salarioBruto = e.getSalario();
-            salarioBruto = ((int) (salarioBruto * 100)) / 100f;
-            double descontos = 0;
+            int tipo = tipoPagamento(e.getAgendaDePagamento());
 
-            MembroSindicalizado ms = e.getSindicalizado();
+            if (tipo != 0) {
+                String nome = e.getNome();
+                double salarioBruto = e.getSalario();
+                salarioBruto = ((int) (salarioBruto * 100)) / 100f;
+                double descontos = 0;
 
-            if (ms != null) {
-                descontos = dataCriacao.lengthOfMonth() * ms.getTaxaSindical();
+                MembroSindicalizado ms = e.getSindicalizado();
 
-                descontos += ms.getTaxaServicos(dataInicial, dataCriacao);
+                if (ms != null) {
+                    descontos = dataCriacao.lengthOfMonth() * ms.getTaxaSindical();
 
+                    descontos += ms.getTaxaServicos(dataInicial, dataCriacao);
+
+                }
+
+                double salarioLiquido = salarioBruto - descontos;
+
+                if (salarioLiquido <= 0) salarioLiquido = 0;
+
+                totalSalarioBruto += salarioBruto;
+                totalSalarioLiquido += salarioLiquido;
+                totalDescontos += descontos;
+
+                String metodo = e.getMetodoPagamento().getOutputFile() + ", " + e.getEndereco();
+
+                FolhaDePagamentoUtils.writeAssalariado(escritor, nome, salarioBruto, descontos, salarioLiquido, metodo);
             }
-
-            double salarioLiquido = salarioBruto - descontos;
-
-            if (salarioLiquido <= 0) salarioLiquido = 0;
-
-            totalSalarioBruto += salarioBruto;
-            totalSalarioLiquido += salarioLiquido;
-            totalDescontos += descontos;
-
-            String metodo = e.getMetodoPagamento().getOutputFile() + ", " + e.getEndereco();
-
-            FolhaDePagamentoUtils.writeAssalariado(escritor, nome, salarioBruto, descontos, salarioLiquido, metodo);
         }
 
         escritor.write("\n");
@@ -150,60 +141,49 @@ public class FolhaDePagamento {
 
         FolhaDePagamentoUtils.writeEmpregadoHeader(escritor, "HORISTAS");
 
-
-        if (dataCriacao.getDayOfWeek() != DayOfWeek.FRIDAY) {
-            escritor.write("\n");
-            String line = Utils.padRight("TOTAL HORISTAS", 36);
-            line += Utils.padLeft(Utils.convertDoubleToString(totalHorasNormais), 6);
-            line += Utils.padLeft(Utils.convertDoubleToString(totalHorasExtras), 6);
-            line += Utils.padLeft(Utils.convertDoubleToString(totalSalarioBruto, 2), 14);
-            line += Utils.padLeft(Utils.convertDoubleToString(totalDescontos, 2), 10);
-            line += Utils.padLeft(Utils.convertDoubleToString(totalSalarioLiquido, 2), 16) + "\n";
-            escritor.write(line);
-
-            return totalSalarioBruto;
-        }
-        ;
-
         HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(empregadoController.getEmpregadoHoristas());
         LocalDate dataInicial = dataCriacao.minusDays(6);
 
         for (Map.Entry<String, String> entry : empregados.entrySet()) {
             EmpregadoHorista e = (EmpregadoHorista) empregadoController.getEmpregado(entry.getKey());
 
+            int tipo = tipoPagamento(e.getAgendaDePagamento());
 
-            String nome = e.getNome();
-            double horaNormais = e.getHorasNormaisTrabalhadas(dataInicial, dataCriacao);
-            double horaExtras = e.getHorasExtrasTrabalhadas(dataInicial, dataCriacao);
-            double salarioBruto = e.getSalarioBruto(dataInicial, dataCriacao);
-            salarioBruto = ((int) (salarioBruto * 100)) / 100f;
-            double descontos = 0;
+            if (tipo != 0) {
 
-            MembroSindicalizado ms = e.getSindicalizado();
+                String nome = e.getNome();
+                double horaNormais = e.getHorasNormaisTrabalhadas(dataInicial, dataCriacao);
+                double horaExtras = e.getHorasExtrasTrabalhadas(dataInicial, dataCriacao);
+                double salarioBruto = e.getSalarioBruto(dataInicial, dataCriacao);
+                salarioBruto = ((int) (salarioBruto * 100)) / 100f;
+                double descontos = 0;
 
-            if (ms != null) {
-                descontos += 7 * ms.getTaxaSindical();
-                descontos += ms.getTaxaServicos(dataInicial, dataCriacao);
-                descontos += e.getDescontos();
+                MembroSindicalizado ms = e.getSindicalizado();
+
+                if (ms != null) {
+                    descontos += 7 * ms.getTaxaSindical();
+                    descontos += ms.getTaxaServicos(dataInicial, dataCriacao);
+                    descontos += e.getDescontos();
+                }
+
+
+                double salarioLiquido = salarioBruto - descontos;
+
+                if (salarioLiquido < 0) {
+                    e.setDescontos(descontos);
+                    salarioLiquido = 0;
+                    descontos = 0;
+                }
+
+                totalHorasNormais += horaNormais;
+                totalHorasExtras += horaExtras;
+                totalSalarioBruto += salarioBruto;
+                totalDescontos += descontos;
+                totalSalarioLiquido += salarioLiquido;
+
+                empregadoController.setValue(entry.getKey(), e);
+                FolhaDePagamentoUtils.writeHorista(escritor, nome, horaNormais, horaExtras, salarioBruto, descontos, salarioLiquido, e.getMetodoPagamento().getOutputFile());
             }
-
-
-            double salarioLiquido = salarioBruto - descontos;
-
-            if (salarioLiquido < 0) {
-                e.setDescontos(descontos);
-                salarioLiquido = 0;
-                descontos = 0;
-            }
-
-            totalHorasNormais += horaNormais;
-            totalHorasExtras += horaExtras;
-            totalSalarioBruto += salarioBruto;
-            totalDescontos += descontos;
-            totalSalarioLiquido += salarioLiquido;
-
-            empregadoController.setValue(entry.getKey(), e);
-            FolhaDePagamentoUtils.writeHorista(escritor, nome, horaNormais, horaExtras, salarioBruto, descontos, salarioLiquido, e.getMetodoPagamento().getOutputFile());
         }
 
         escritor.write("\n");
@@ -231,84 +211,69 @@ public class FolhaDePagamento {
 
         FolhaDePagamentoUtils.writeEmpregadoHeader(escritor, "COMISSIONADOS");
 
-
-        boolean multiplo = (ChronoUnit.DAYS.between(LocalDate.of(2005, 1, 1), dataCriacao) + 1) % 14 == 0;
-
-        boolean deveCalcular = dataCriacao.getDayOfWeek() == DayOfWeek.FRIDAY && multiplo;
-
-
-        if (!deveCalcular) {
-            escritor.write("\n");
-            String footer = Utils.padRight("TOTAL COMISSIONADOS", 21);
-
-            footer += Utils.padLeft(Utils.convertDoubleToString(totalSalarioFixo, 2), 9);
-            footer += Utils.padLeft(Utils.convertDoubleToString(totalVendas, 2), 9);
-            footer += Utils.padLeft(Utils.convertDoubleToString(totalComissao, 2), 9);
-            footer += Utils.padLeft(Utils.convertDoubleToString(totalSalarioBruto, 2), 14);
-            footer += Utils.padLeft(Utils.convertDoubleToString(totalDescontos, 2), 10);
-            footer += Utils.padLeft(Utils.convertDoubleToString(totalSalarioLiquido, 2), 16) + "\n";
-            escritor.write(footer);
-
-            return totalSalarioBruto;
-        }
-
-
         HashMap<String, String> empregados = EmpregadoUtils.sortEmpregadosByName(empregadoController.getEmpregadoComissionado());
 
-        LocalDate dataInicial = dataCriacao.minusDays(13);
 
         try {
-
-
             for (Map.Entry<String, String> entry : empregados.entrySet()) {
                 EmpregadoComissionado e = (EmpregadoComissionado) empregadoController.getEmpregado(entry.getKey());
 
-                String nome = e.getNome();
+                int tipo = tipoPagamento(e.getAgendaDePagamento());
 
-                double salarioFixo = 0;
-                double vendas = 0;
-                double comissao = 0;
-                double salarioBruto = 0;
-                double descontos = 0;
+                if (tipo != 0) {
 
-                double salarioLiquido = 0;
+                    String [] pagamento = e.getAgendaDePagamento().split(" ");
 
-                salarioFixo = e.getSalario();
-                salarioFixo = Math.floor((salarioFixo * 12D / 52D) * 2D * 100) / 100F;
+                    int weekPagamento = Integer.parseInt(pagamento[1]);
+                    LocalDate dataInicial = dataCriacao.minusDays((weekPagamento * 7) - 1);
 
-                salarioFixo = ((int) (salarioFixo * 100)) / 100.0f;
-                vendas = e.getVendasRealizadas(dataInicial, dataCriacao);
-                comissao = e.getTaxaDeComissao();
+                    String nome = e.getNome();
 
-                comissao = vendas * comissao;
+                    double salarioFixo = 0;
+                    double vendas = 0;
+                    double comissao = 0;
+                    double salarioBruto = 0;
+                    double descontos = 0;
 
-                comissao = Math.floor(comissao * 100) / 100F;
+                    double salarioLiquido = 0;
 
-                salarioBruto = salarioFixo + comissao;
+                    salarioFixo = e.getSalario();
+                    salarioFixo = Math.floor((salarioFixo * 12D / 52D) * 2D * 100) / 100F;
 
-                MembroSindicalizado m = e.getSindicalizado();
+                    salarioFixo = ((int) (salarioFixo * 100)) / 100.0f;
+                    vendas = e.getVendasRealizadas(dataInicial, dataCriacao);
+                    comissao = e.getTaxaDeComissao();
 
-                if (m != null) {
-                    double diasDiff = ChronoUnit.DAYS.between(dataInicial, dataCriacao) + 1;
-                    descontos = m.getTaxaServicos(dataInicial, dataCriacao) + diasDiff * m.getTaxaSindical();
+                    comissao = vendas * comissao;
+
+                    comissao = Math.floor(comissao * 100) / 100F;
+
+                    salarioBruto = salarioFixo + comissao;
+
+                    MembroSindicalizado m = e.getSindicalizado();
+
+                    if (m != null) {
+                        double diasDiff = ChronoUnit.DAYS.between(dataInicial, dataCriacao) + 1;
+                        descontos = m.getTaxaServicos(dataInicial, dataCriacao) + diasDiff * m.getTaxaSindical();
+                    }
+
+                    if (salarioBruto >= descontos) {
+                        salarioLiquido = salarioBruto - descontos;
+                    }
+
+                    totalSalarioLiquido += salarioLiquido;
+                    totalComissao += comissao;
+                    totalSalarioBruto += salarioBruto;
+                    totalVendas += vendas;
+                    totalSalarioFixo += salarioFixo;
+                    totalDescontos += descontos;
+
+
+                    String metodo = e.getMetodoPagamento().getOutputFile() + ", " + e.getEndereco();
+
+                    FolhaDePagamentoUtils.writeComissionado(escritor, nome, salarioFixo, vendas, comissao, salarioBruto, descontos, salarioLiquido, metodo);
+
                 }
-
-                if (salarioBruto >= descontos) {
-                    salarioLiquido = salarioBruto - descontos;
-                }
-
-                totalSalarioLiquido += salarioLiquido;
-                totalComissao += comissao;
-                totalSalarioBruto += salarioBruto;
-                totalVendas += vendas;
-                totalSalarioFixo += salarioFixo;
-                totalDescontos += descontos;
-
-
-                String metodo = e.getMetodoPagamento().getOutputFile() + ", " + e.getEndereco();
-
-                FolhaDePagamentoUtils.writeComissionado(escritor, nome, salarioFixo, vendas, comissao, salarioBruto, descontos, salarioLiquido, metodo);
-
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -332,7 +297,7 @@ public class FolhaDePagamento {
         return totalSalarioBruto;
     }
 
-    public boolean pagamentoSemanal(String day) {
+    private boolean pagamentoSemanal(String day) {
         switch (day) {
             case "1" -> {
                 if (DayOfWeek.MONDAY == dataCriacao.getDayOfWeek()) {
@@ -389,7 +354,7 @@ public class FolhaDePagamento {
         }
     }
 
-    public boolean pagamentoMensal(String day) {
+    private boolean pagamentoMensal(String day) {
         switch (day) {
             case "$" -> {
                 if (dataCriacao.getDayOfMonth() == dataCriacao.lengthOfMonth()) {
@@ -411,7 +376,46 @@ public class FolhaDePagamento {
         }
     }
 
-    public double totalFolha(EmpregadoController empregadoController) throws Exception {
+    private int tipoPagamento(String agendaPagamento) {
+
+        String[] pagamento = agendaPagamento.split(" ");
+
+        if (pagamento.length == 2 || pagamento.length == 3) {
+            if (pagamento[0].equals("semanal") && pagamento.length == 2) {
+                if (pagamentoSemanal(pagamento[1])) {
+                    return 1;
+                }
+            } else if (pagamento[0].equals("semanal") && pagamento.length == 3) {
+                int week = dataCriacao.get(WeekFields.ISO.weekOfWeekBasedYear());
+                int weekPagamento = Integer.parseInt(pagamento[1]);
+
+                boolean multiplo = (week % weekPagamento == 0);
+                boolean deveCalcular = pagamentoSemanal(pagamento[2]) && multiplo;
+
+                if (deveCalcular) return 2;
+
+            } else if (pagamento[0].equals("mensal")) {
+
+                if (pagamentoMensal(pagamento[1])) {
+                    return 3;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private double getEmpregadoSalarioBruto (Empregado empregado, LocalDate dataInicial) {
+        if (empregado.getTipo().equals("horista")) {
+            return  ((EmpregadoHorista) empregado).getSalarioBruto(dataInicial, dataCriacao);
+        } else if (empregado.getTipo().equals("assalariado")) {
+            return  ((EmpregadoAssalariado) empregado).getSalarioBruto();
+        } else {
+            return  ((EmpregadoComissionado) empregado).getSalarioBruto(dataInicial, dataCriacao);
+        }
+    }
+
+    public double totalFolha(EmpregadoController empregadoController) {
 
         double total = 0;
 
@@ -423,60 +427,28 @@ public class FolhaDePagamento {
             String[] pagamento = empregado.getAgendaDePagamento().split(" ");
             double salarioBruto = 0;
 
-            if (pagamento.length == 2 || pagamento.length == 3) {
-                if (pagamento[0].equals("semanal") && pagamento.length == 2) {
+            int tipo = this.tipoPagamento(empregado.getAgendaDePagamento());
 
-                    if (pagamentoSemanal(pagamento[1])) {
-                        LocalDate dataInicial = dataCriacao.minusDays(6);
+            if (tipo == 1) {
+                LocalDate dataInicial = dataCriacao.minusDays(6);
 
-                        if (empregado.getTipo().equals("horista")) {
-                            salarioBruto = ((EmpregadoHorista) empregado).getSalarioBruto(dataInicial, dataCriacao);
-                        } else if (empregado.getTipo().equals("assalariado")) {
-                            salarioBruto = ((EmpregadoAssalariado) empregado).getSalarioBruto();
-                        } else {
-                            salarioBruto = ((EmpregadoComissionado) empregado).getSalarioBruto(dataInicial, dataCriacao);
-                        }
+                salarioBruto = getEmpregadoSalarioBruto(empregado, dataInicial);
+                salarioBruto = ((int) (salarioBruto * 100)) / 100f;
 
-                        salarioBruto = ((int) (salarioBruto * 100)) / 100f;
-                    }
+            } else if (tipo == 2) {
 
-                } else if (pagamento[0].equals("semanal") && pagamento.length == 3) {
-                    int week = dataCriacao.get(WeekFields.ISO.weekOfWeekBasedYear());
-                    int weekPagamento = Integer.parseInt(pagamento[1]);
+                int weekPagamento = Integer.parseInt(pagamento[1]);
 
-                    boolean multiplo = (week % weekPagamento == 0);
+                LocalDate dataInicial = dataCriacao.minusDays((weekPagamento * 7) - 1);
 
-                    boolean deveCalcular = pagamentoSemanal(pagamento[2]) && multiplo;
+                salarioBruto = getEmpregadoSalarioBruto(empregado, dataInicial);
 
-                    if (!deveCalcular) continue;
+            } else if (tipo == 3) {
 
-                    LocalDate dataInicial = dataCriacao.minusDays((weekPagamento*7) - 1);
+                LocalDate dataInicial = dataCriacao.minusDays(dataCriacao.lengthOfMonth() - 1);
 
-                    if (empregado.getTipo().equals("horista")) {
-                        salarioBruto = ((EmpregadoHorista) empregado).getSalarioBruto(dataInicial, dataCriacao);
-                    } else if (empregado.getTipo().equals("assalariado")) {
-                        salarioBruto = ((EmpregadoAssalariado) empregado).getSalarioBruto();
-                    } else {
-                        salarioBruto = ((EmpregadoComissionado) empregado).getSalarioBruto(dataInicial, dataCriacao);
-                    }
-
-                } else if (pagamento[0].equals("mensal")) {
-
-                    if (pagamentoMensal(pagamento[1])) {
-
-                        if (empregado.getTipo().equals("horista")) {
-                            LocalDate dataInicial = dataCriacao.minusDays(dataCriacao.lengthOfMonth() - 1);
-                            salarioBruto = ((EmpregadoHorista) empregado).getSalarioBruto(dataInicial, dataCriacao);
-                        } else if (empregado.getTipo().equals("assalariado")) {
-                            salarioBruto = ((EmpregadoAssalariado) empregado).getSalarioBruto();
-                        } else {
-                            LocalDate dataInicial = dataCriacao.minusDays(dataCriacao.lengthOfMonth() - 1);
-                            salarioBruto = ((EmpregadoComissionado) empregado).getSalarioBruto(dataInicial, dataCriacao);
-                        }
-                    }
-
-                    salarioBruto = ((int) (salarioBruto * 100)) / 100f;
-                }
+                salarioBruto = getEmpregadoSalarioBruto(empregado, dataInicial);
+                salarioBruto = ((int) (salarioBruto * 100)) / 100f;
             }
 
             total += salarioBruto;
