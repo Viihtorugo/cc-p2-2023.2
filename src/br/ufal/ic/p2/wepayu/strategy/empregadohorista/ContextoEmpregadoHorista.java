@@ -1,7 +1,6 @@
 package br.ufal.ic.p2.wepayu.strategy.empregadohorista;
 
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
-import br.ufal.ic.p2.wepayu.controller.SystemController;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista.EmpregadoHorista;
 import br.ufal.ic.p2.wepayu.utils.Valid;

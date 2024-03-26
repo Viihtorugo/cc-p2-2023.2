@@ -1,7 +1,6 @@
 package br.ufal.ic.p2.wepayu.strategy.empregadocomissionado;
 
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
-import br.ufal.ic.p2.wepayu.controller.SystemController;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 import br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadocomissionado.EmpregadoComissionado;
 import br.ufal.ic.p2.wepayu.utils.Utils;

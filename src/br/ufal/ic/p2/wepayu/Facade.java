@@ -1,112 +1,112 @@
 package br.ufal.ic.p2.wepayu;
 
-import br.ufal.ic.p2.wepayu.controller.FacadeController;
+import br.ufal.ic.p2.wepayu.controller.SystemController;
 
 public class Facade {
 
-    private FacadeController facedeController;
+    private SystemController systemController;
 
     public Facade() {
-        this.facedeController = new FacadeController();
+        this.systemController = new SystemController();
     }
 
     public void zerarSistema() throws Exception {
-        this.facedeController.zerarSistema();
+        this.systemController.zerarSistema();
     }
 
     public void encerrarSistema() {
-        this.facedeController.encerrarSistema();
+        this.systemController.encerrarSistema();
     }
 
     public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws Exception {
-        return this.facedeController.criarEmpregado(nome, endereco, tipo, salario);
+        return this.systemController.criarEmpregado(nome, endereco, tipo, salario);
     }
 
     public String criarEmpregado(String nome, String endereco, String tipo, String salario, String comissao) throws Exception {
-        return this.facedeController.criarEmpregado(nome, endereco, tipo, salario, comissao);
+        return this.systemController.criarEmpregado(nome, endereco, tipo, salario, comissao);
     }
 
     public void lancaCartao(String emp, String data, String horas) throws Exception {
-        this.facedeController.lancaCartao(emp, data, horas);
+        this.systemController.lancaCartao(emp, data, horas);
     }
 
     public void lancaVenda(String emp, String data, String valor) throws Exception {
-        this.facedeController.lancaVenda(emp, data, valor);
+        this.systemController.lancaVenda(emp, data, valor);
     }
 
     public void lancaTaxaServico(String membro, String data, String valor) throws Exception {
-        this.facedeController.lancaTaxaServico(membro, data, valor);
+        this.systemController.lancaTaxaServico(membro, data, valor);
     }
 
     public String getEmpregadoPorNome(String nome, int indice) throws Exception {
-        return this.facedeController.getEmpregadoPorNome(nome, indice);
+        return this.systemController.getEmpregadoPorNome(nome, indice);
     }
 
     public String getAtributoEmpregado(String emp, String atributo) throws Exception {
-        return this.facedeController.getAtributoEmpregado(emp, atributo);
+        return this.systemController.getAtributoEmpregado(emp, atributo);
     }
 
     public String getHorasNormaisTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception {
-        return this.facedeController.getHorasNormaisTrabalhadas(emp, dataInicial, dataFinal);
+        return this.systemController.getHorasNormaisTrabalhadas(emp, dataInicial, dataFinal);
     }
 
     public String getHorasExtrasTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception {
-        return this.facedeController.getHorasExtrasTrabalhadas(emp, dataInicial, dataFinal);
+        return this.systemController.getHorasExtrasTrabalhadas(emp, dataInicial, dataFinal);
     }
 
     public String getVendasRealizadas(String emp, String dataInicial, String dataFinal) throws Exception {
-        return this.facedeController.getVendasRealizadas(emp, dataInicial, dataFinal);
+        return this.systemController.getVendasRealizadas(emp, dataInicial, dataFinal);
     }
 
     public String getTaxasServico(String emp, String dataInicial, String dataFinal) throws Exception {
-        return this.facedeController.getTaxasServico(emp, dataInicial, dataFinal);
+        return this.systemController.getTaxasServico(emp, dataInicial, dataFinal);
     }
 
     // 3 variaveis
     public void alteraEmpregado(String emp, String atributo, String valor) throws Exception {
-        this.facedeController.alteraEmpregado(emp, atributo, valor);
+        this.systemController.alteraEmpregado(emp, atributo, valor);
     }
 
     // 4 variaveis
     public void alteraEmpregado(String emp, String atributo, String valor, String salario) throws Exception {
-        this.facedeController.alteraEmpregado(emp, atributo, valor, salario);
+        this.systemController.alteraEmpregado(emp, atributo, valor, salario);
     }
 
     // 5 variaveis
     public void alteraEmpregado(String emp, String atributo, String valor, String idSindicato, String taxaSindical) throws Exception {
-        this.facedeController.alteraEmpregado(emp, atributo, valor, idSindicato, taxaSindical);
+        this.systemController.alteraEmpregado(emp, atributo, valor, idSindicato, taxaSindical);
     }
 
     // 6 variaveis
     public void alteraEmpregado(String emp, String atributo, String tipo, String banco, String agencia, String contaCorrente) throws Exception {
-        this.facedeController.alteraEmpregado(emp, atributo, tipo, banco, agencia, contaCorrente);
+        this.systemController.alteraEmpregado(emp, atributo, tipo, banco, agencia, contaCorrente);
     }
 
     public void removerEmpregado(String emp) throws Exception {
-        this.facedeController.removerEmpregado(emp);
+        this.systemController.removerEmpregado(emp);
     }
 
     public String totalFolha(String data) throws Exception {
-        return this.facedeController.totalFolha(data);
+        return this.systemController.totalFolha(data);
     }
 
     public void rodaFolha(String data, String saida) throws Exception {
-        this.facedeController.rodaFolha(data, saida);
+        this.systemController.rodaFolha(data, saida);
     }
 
     public String getNumeroDeEmpregados() {
-        return this.facedeController.getNumeroDeEmpregados();
+        return this.systemController.getNumeroDeEmpregados();
     }
 
     public void undo() throws Exception {
-        this.facedeController.undo();
+        this.systemController.undo();
     }
 
     public void redo() throws Exception {
-        this.facedeController.redo();
+        this.systemController.redo();
     }
 
     public void criarAgendaDePagamentos(String descricao) throws Exception {
-        this.facedeController.criarAgendaDePagamentos(descricao);
+        this.systemController.criarAgendaDePagamentos(descricao);
     }
 }

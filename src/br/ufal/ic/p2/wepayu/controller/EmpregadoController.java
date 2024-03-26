@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EmpregadoController {
-
     private HashMap<String, Empregado> empregados;
     private int key;
 

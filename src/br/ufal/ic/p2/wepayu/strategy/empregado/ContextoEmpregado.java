@@ -2,7 +2,6 @@ package br.ufal.ic.p2.wepayu.strategy.empregado;
 
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.controller.FolhaDePagamentoController;
-import br.ufal.ic.p2.wepayu.controller.SystemController;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionNaoHaEmpregadoComEsseNome;
 import br.ufal.ic.p2.wepayu.exceptions.ExceptionTipoInvalido;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;

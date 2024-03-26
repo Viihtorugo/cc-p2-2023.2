@@ -2,7 +2,7 @@ package br.ufal.ic.p2.wepayu.strategy;
 
 import br.ufal.ic.p2.wepayu.controller.EmpregadoController;
 import br.ufal.ic.p2.wepayu.controller.FolhaDePagamentoController;
-import br.ufal.ic.p2.wepayu.controller.SystemController;
+import br.ufal.ic.p2.wepayu.utils.StateSystem;
 import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 import br.ufal.ic.p2.wepayu.strategy.empregado.StrategyEmpregado;
 import br.ufal.ic.p2.wepayu.strategy.empregadocomissionado.StrategyEmpregadoComissionado;
@@ -15,10 +15,10 @@ public class Contexto {
                                     String tipo, String salario,
                                     EmpregadoController empregadoController) throws Exception {
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             return strategyEmpregado.executeCriarEmpregado(nome, endereco, tipo, salario, empregadoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
@@ -27,10 +27,10 @@ public class Contexto {
                                      String tipo, String salario, String comissao,
                                      EmpregadoController empregadoController) throws Exception {
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             return strategyEmpregado.executeCriarEmpregado(nome, endereco, tipo, salario, comissao, empregadoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
@@ -56,10 +56,10 @@ public class Contexto {
     public void removerEmpregado(StrategyEmpregado strategyEmpregado,
                                  String emp, EmpregadoController empregadoController) throws Exception {
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             strategyEmpregado.executeRemoveEmpregado(emp, empregadoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
@@ -90,10 +90,10 @@ public class Contexto {
                                              String emp, String data, String horas,
                                              EmpregadoController empregadoController) throws Exception {
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             strategyEmpregadoHorista.executeLancaCartao(emp, data, horas, empregadoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
@@ -102,10 +102,10 @@ public class Contexto {
                            String emp, String data, String valor,
                            EmpregadoController empregadoController) throws Exception {
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             strategyEmpregadoComissionado.executeLancaVenda(emp, data, valor, empregadoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
@@ -114,10 +114,10 @@ public class Contexto {
                                     String membro, String data, String valor,
                                     EmpregadoController empregadoController) throws Exception {
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             strategyEmpregado.executeLancaTaxaServico(membro, data, valor, empregadoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
@@ -150,10 +150,10 @@ public class Contexto {
                                 String valor, EmpregadoController empregadoController,
                                 FolhaDePagamentoController folhaDePagamentoController) throws Exception {
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             strategyEmpregado.executeAlteraEmpregado(emp, atributo, valor, empregadoController, folhaDePagamentoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
@@ -162,10 +162,10 @@ public class Contexto {
     public void alteraEmpregado(StrategyEmpregado strategyEmpregado, String emp, String atributo,
                                 String valor, String sal, EmpregadoController empregadoController) throws Exception {
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             strategyEmpregado.executeAlteraEmpregado(emp, atributo, valor, sal, empregadoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
@@ -176,11 +176,11 @@ public class Contexto {
                                 EmpregadoController empregadoController) throws Exception {
 
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             strategyEmpregado.executeAlteraEmpregado(emp, atributo, valor,
                     idSindicato, taxaSindical, empregadoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
@@ -191,11 +191,11 @@ public class Contexto {
                                 EmpregadoController empregadoController) throws Exception {
 
         try {
-            SystemController.pushUndo(empregadoController);
+            StateSystem.pushUndo(empregadoController);
             strategyEmpregado.executeAlteraEmpregado(emp, atributo, tipo,
                     banco, agencia, contaCorrente, empregadoController);
         } catch (Exception e) {
-            SystemController.popUndoErro();
+            StateSystem.popUndoErro();
             throw e;
         }
     }
