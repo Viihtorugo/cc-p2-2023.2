@@ -1,13 +1,15 @@
 package br.ufal.ic.p2.wepayu;
 
 import br.ufal.ic.p2.wepayu.controller.SystemController;
+import br.ufal.ic.p2.wepayu.utils.StateSystem;
 
 public class Facade {
 
     private SystemController systemController;
 
     public Facade() {
-        this.systemController = new SystemController();
+        this.systemController = SystemController.getInstance();
+        StateSystem.systemStart();
     }
 
     public void zerarSistema() throws Exception {

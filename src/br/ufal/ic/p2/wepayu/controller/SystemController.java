@@ -15,10 +15,9 @@ public class SystemController {
 
     private EmpregadoController empregadoController;
     private FolhaDePagamentoController folhaDePagamentoController;
+    private static SystemController instance;
 
-    public SystemController() {
-        StateSystem.systemStart();
-
+    private SystemController () {
         //Persistencia
         this.empregadoController = new EmpregadoController();
         EmpregadoXML xmlEmpregado = new EmpregadoXML();
@@ -27,6 +26,13 @@ public class SystemController {
         FolhaDePagamentoXML xmlFolha = new FolhaDePagamentoXML();
         this.folhaDePagamentoController = new FolhaDePagamentoController(true);
         this.folhaDePagamentoController = xmlFolha.readFolha();
+    }
+
+    public static SystemController getInstance () {
+        if (SystemController.instance == null)
+            SystemController.instance = new SystemController();
+
+        return instance;
     }
 
     public void zerarSistema() throws Exception {
