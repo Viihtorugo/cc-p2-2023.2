@@ -6,40 +6,42 @@ import br.ufal.ic.p2.wepayu.models.empregado.Empregado;
 import br.ufal.ic.p2.wepayu.models.empregado.membrosindicalizado.MembroSindicalizado;
 import br.ufal.ic.p2.wepayu.models.empregado.metodopagamento.MetodoPagamento;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Valid {
 
     public boolean validNome(String nome) {
-        if (nome.isEmpty()) throw new ExceptionNomeNaoPodeSerNulo();
+        if (nome.isEmpty())
+            throw new ExceptionNomeNaoPodeSerNulo();
 
         return true;
     }
 
     public boolean validEndereco(String endereco) {
 
-        if (endereco.isEmpty()) throw new ExceptionEnderecoNaoPodeSerNulo();
+        if (endereco.isEmpty())
+            throw new ExceptionEnderecoNaoPodeSerNulo();
 
         return true;
     }
 
     public boolean validTipoNaoComissionado(String tipo) {
 
-        if (tipo.equals("assalariado") || tipo.equals("horista")) return true;
+        if (tipo.equals("assalariado") || tipo.equals("horista"))
+            return true;
 
-        if (tipo.equals("comissionado")) throw new ExceptionTipoNaoAplicavel();
+        if (tipo.equals("comissionado"))
+            throw new ExceptionTipoNaoAplicavel();
 
         throw new ExceptionTipoInvalido();
     }
 
     public boolean validTipoComissionado(String tipo) {
 
-        if (tipo.equals("comissionado")) return true;
+        if (tipo.equals("comissionado"))
+            return true;
 
         if (tipo.equals("assalariado") || tipo.equals("horista"))
             throw new ExceptionTipoNaoAplicavel();
@@ -217,7 +219,6 @@ public class Valid {
 
         if (membro.isEmpty())
             throw new ExceptionIdentificacaoDoMembroNaoPodeSerNula();
-
 
         String id = empregadoController.getEmpregadoPorIdSindical(membro);
 

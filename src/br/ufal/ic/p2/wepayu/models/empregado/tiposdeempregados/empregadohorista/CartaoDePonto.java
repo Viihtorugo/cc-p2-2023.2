@@ -1,7 +1,5 @@
 package br.ufal.ic.p2.wepayu.models.empregado.tiposdeempregados.empregadohorista;
 
-import java.time.LocalDate;
-
 public class CartaoDePonto {
 
     private String data;
